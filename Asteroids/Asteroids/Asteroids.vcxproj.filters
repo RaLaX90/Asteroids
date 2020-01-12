@@ -15,12 +15,15 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Sprite.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
     <ClCompile Include="game.cpp">
-      <Filter>Файлы ресурсов</Filter>
+      <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Framework.h">
+    <ClInclude Include="Sprite.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

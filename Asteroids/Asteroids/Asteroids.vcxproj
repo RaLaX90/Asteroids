@@ -92,7 +92,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>C:\Libs\SDL2-2.0.10\lib\x86;C:\Libs\SDL2_image-2.0.5\lib\x86;C:\Libs\SDL2_mixer-2.0.4\lib\x86;D:\резюме\Киев\Dragon%27s Lake Entertainment\Тестовое задание\Asteroids\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_mixer.lib;FrameworkRelease_x64.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
@@ -148,10 +148,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Framework.h" />
+    <ClInclude Include="Sprite.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="game.cpp" />
+    <ClCompile Include="Sprite.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
