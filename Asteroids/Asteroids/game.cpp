@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
 	string str, s1, s2;
 	int SCREEN_WIDTH = 0, SCREEN_HEIGHT = 0, MAP_WIDTH = 0, MAP_HEIGHT = 0, big_asteroids_number = 0;
 
-	if (string(argv[1]) == "-window") {
+	if (argv[1]) {
 		str = string(argv[2]);
 		auto pos = str.find("x");
 		s1 = str.substr(0, pos);
@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
 		SCREEN_HEIGHT = 800;
 	}
 
-	if (string(argv[3]) == "-map") {
+	if (argv[3]) {
 		str = string(argv[4]);
 		auto pos = str.find("x");
 		s1 = str.substr(0, pos);
@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
 		MAP_HEIGHT = 600;
 	}
 
-	if (string(argv[5]) == "-num_asteroids") {
+	if (argv[5]) {
 		big_asteroids_number = atoi(string({ argv[6] }).c_str());////////////////////////////////////////////////////////////////
 	}
 	else {

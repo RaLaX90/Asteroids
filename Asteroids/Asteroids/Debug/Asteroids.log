@@ -4,5 +4,9 @@ d:\резюме\киев\dragon's lake entertainment\тестовое задан
 d:\резюме\киев\dragon's lake entertainment\тестовое задание\asteroids\asteroids\game.cpp(233): warning C4244: аргумент: преобразование "double" в "int", возможна потеря данных
 d:\резюме\киев\dragon's lake entertainment\тестовое задание\asteroids\asteroids\game.cpp(240): warning C4244: аргумент: преобразование "double" в "int", возможна потеря данных
 d:\резюме\киев\dragon's lake entertainment\тестовое задание\asteroids\asteroids\game.cpp(247): warning C4244: аргумент: преобразование "double" в "int", возможна потеря данных
+  Sprite.cpp
+d:\резюме\киев\dragon's lake entertainment\тестовое задание\asteroids\asteroids\sprite.cpp(99): warning C4244: =: преобразование "double" в "int", возможна потеря данных
+d:\резюме\киев\dragon's lake entertainment\тестовое задание\asteroids\asteroids\sprite.cpp(100): warning C4244: =: преобразование "double" в "int", возможна потеря данных
+  Создание кода...
 d:\резюме\киев\dragon's lake entertainment\тестовое задание\asteroids\asteroids\game.cpp(26): warning C4715: is_collision: значение возвращается не при всех путях выполнения
   Asteroids.vcxproj -> D:\резюме\Киев\Dragon's Lake Entertainment\Тестовое задание\Asteroids\Debug\Asteroids.exe
