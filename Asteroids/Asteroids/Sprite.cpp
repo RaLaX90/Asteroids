@@ -1,7 +1,6 @@
 #include "Sprite.h"
 
-
-CSprite::CSprite(SDL_Renderer * passed_renderer, std::string Path, int start_point_X, int start_point_Y, int direction_X, int direction_Y, int w, int h, int border[])
+CSprite::CSprite(SDL_Renderer* passed_renderer, std::string Path, int start_point_X, int start_point_Y, int direction_X, int direction_Y, int w, int h, int border[])
 {
 	this->renderer = passed_renderer;
 
@@ -24,13 +23,13 @@ CSprite::CSprite(SDL_Renderer * passed_renderer, std::string Path, int start_poi
 	this->image = IMG_LoadTexture(renderer, Path.c_str());
 	if (!image)
 	{
-		std::cout << IMG_GetError(); // Можно заменить на SDL_GetError()
+		std::cout << IMG_GetError(); //Can be replaced by SDL_GetError()
 	}
 
-	rect.x = start_point_X;
-	rect.y = start_point_Y;
-	rect.w = w;
-	rect.h = h;
+	this->rect.x = start_point_X;
+	this->rect.y = start_point_Y;
+	this->rect.w = w;
+	this->rect.h = h;
 }
 
 
@@ -79,7 +78,6 @@ int CSprite::GetDirectionY()
 	return this->direction_Y;
 }
 
-
 void CSprite::Motion()
 {
 	if ((this->rect.x + this->GetOrginX()) < this->left_border_X) {
@@ -105,7 +103,6 @@ void CSprite::Motion()
 			this->rect.y += this->direction_Y;
 		}
 	}
-
 }
 
 int CSprite::GetOrginX()
@@ -117,6 +114,3 @@ int CSprite::GetOrginY()
 {
 	return this->orgin_Y;
 }
-
-
-

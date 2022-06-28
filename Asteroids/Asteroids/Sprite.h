@@ -8,7 +8,7 @@
 class CSprite
 {
 public:
-	CSprite(SDL_Renderer * passed_renderer, std::string Path, int start_point_X, int start_point_Y, int change_direction_X, int change_direction_Y, int w, int h, int border[]);
+	CSprite(SDL_Renderer* passed_renderer, std::string Path, int start_point_X, int start_point_Y, int change_direction_X, int change_direction_Y, int w, int h, int border[]);
 	~CSprite();
 
 	void Draw();
@@ -29,7 +29,7 @@ public:
 	int GetOrginY();
 
 private:
-	SDL_Texture *image;
+	SDL_Texture* image;
 	SDL_Rect rect;
 
 	int orgin_X;
@@ -48,7 +48,6 @@ private:
 
 	double final_counter;
 
-	SDL_Renderer *renderer;
-
+	SDL_Renderer* renderer;
 };
 
