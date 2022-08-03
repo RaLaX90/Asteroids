@@ -1,116 +1,108 @@
 #include "Sprite.h"
 
-CSprite::CSprite(SDL_Renderer* passed_renderer, std::string Path, int start_point_X, int start_point_Y, int direction_X, int direction_Y, int w, int h, int border[])
+Sprite::Sprite(SDL_Renderer* renderer, const char* path_to_image, COORD start_point, COORD direction, Uint16 width, Uint16 height)
 {
-	this->renderer = passed_renderer;
-
-	this->orgin_X = w / 2;
-	this->orgin_Y = h / 2;
+	this->orgin.X = width / 2;
+	this->orgin.Y = height / 2;
 
 	this->final_counter = 0;
 
-	this->start_point_X = start_point_X;
-	this->start_point_Y = start_point_Y;
+	this->start_point.X = start_point.X;
+	this->start_point.Y = start_point.Y;
 
-	this->direction_X = direction_X;
-	this->direction_Y = direction_Y;
+	this->direction.X = direction.X;
+	this->direction.Y = direction.Y;
 
-	this->top_border_Y = border[0];
-	this->left_border_X = border[1];
-	this->bottom_border_Y = border[2];
-	this->right_border_X = border[3];
-
-	this->image = IMG_LoadTexture(renderer, Path.c_str());
+	this->image = IMG_LoadTexture(renderer, path_to_image);
 	if (!image)
 	{
 		std::cout << IMG_GetError(); //Can be replaced by SDL_GetError()
 	}
 
-	this->rect.x = start_point_X;
-	this->rect.y = start_point_Y;
-	this->rect.w = w;
-	this->rect.h = h;
+	this->location.x = start_point.X;
+	this->location.y = start_point.Y;
+	this->location.w = width;
+	this->location.h = height;
 }
 
-
-CSprite::~CSprite()
+Sprite::~Sprite()
 {
 	SDL_DestroyTexture(image);
 }
 
-void CSprite::Draw() {
-	SDL_RenderCopy(renderer, image, NULL, &rect);
+void Sprite::Draw(SDL_Renderer* renderer) {
+	SDL_RenderCopy(renderer, image, NULL, &location);
 }
 
-void CSprite::SetX(int X)
+void Sprite::SetX(int X)
 {
-	this->rect.x = X;
+	this->location.x = X;
 }
 
-void CSprite::SetY(int Y)
+void Sprite::SetY(int Y)
 {
-	this->rect.y = Y;
+	this->location.y = Y;
 }
 
-int CSprite::GetX()
+int Sprite::GetX()
 {
-	return this->rect.x;
+	return this->location.x;
 }
 
-int CSprite::GetY()
+int Sprite::GetY()
 {
-	return this->rect.y;
+	return this->location.y;
 }
 
-void CSprite::SetDirection(int new_direction_X, int new_direction_Y)
+void Sprite::SetDirection(COORD new_direction)
 {
-	this->direction_X = new_direction_X;
-	this->direction_Y = new_direction_Y;
+	this->direction.X = new_direction.X;
+	this->direction.Y = new_direction.Y;
 }
 
-int CSprite::GetDirectionX()
+int Sprite::GetDirectionX()
 {
-	return this->direction_X;
+	return this->direction.X;
 }
 
-int CSprite::GetDirectionY()
+int Sprite::GetDirectionY()
 {
-	return this->direction_Y;
+	return this->direction.Y;
 }
 
-void CSprite::Motion()
+void Sprite::Move(Screen _scr)
 {
-	if ((this->rect.x + this->GetOrginX()) < this->left_border_X) {
-		this->rect.x = (this->right_border_X) - this->GetOrginX();
+	if ((this->location.x + this->GetOrginX()) < _scr.GetLeftBorder()) {
+		this->location.x = _scr.GetRightBorder() - this->GetOrginX();
 	}
-	else if ((this->rect.x + this->GetOrginX()) > (this->right_border_X)) {
-		this->rect.x = this->left_border_X - this->GetOrginX();
+	else if ((this->location.x + this->GetOrginX()) > _scr.GetRightBorder()) {
+		this->location.x = _scr.GetLeftBorder() - this->GetOrginX();
 	}
-	else if ((this->rect.y + this->GetOrginY()) < this->top_border_Y) {
-		this->rect.y = (this->bottom_border_Y) - this->GetOrginY();
+	else if ((this->location.y + this->GetOrginY()) < _scr.GetTopBorder()) {
+		this->location.y = _scr.GetBottomBorder() - this->GetOrginY();
 	}
-	else if ((this->rect.y + this->GetOrginY()) > (this->bottom_border_Y)) {
-		this->rect.y = this->top_border_Y - this->GetOrginY();
+	else if ((this->location.y + this->GetOrginY()) > _scr.GetBottomBorder()) {
+		this->location.y = _scr.GetTopBorder() - this->GetOrginY();
 	}
 	else {
-		if (this->rect.w == 20) {
-			this->rect.x = this->start_point_X + (this->direction_X - this->start_point_X) * final_counter;
-			this->rect.y = this->start_point_Y + (this->direction_Y - this->start_point_Y) * final_counter;
+		if (this->location.w == 20) {
+			this->location.x = this->start_point.X + (this->direction.X - this->start_point.X) * final_counter;
+			this->location.y = this->start_point.Y + (this->direction.Y - this->start_point.Y) * final_counter;
 			this->final_counter += 0.02;
 		}
 		else {
-			this->rect.x += this->direction_X;
-			this->rect.y += this->direction_Y;
+			this->location.x += this->direction.X;
+			this->location.y += this->direction.Y;
 		}
 	}
 }
 
-int CSprite::GetOrginX()
+int Sprite::GetOrginX()
 {
-	return this->orgin_X;
+	return this->orgin.X;
 }
 
-int CSprite::GetOrginY()
+int Sprite::GetOrginY()
 {
-	return this->orgin_Y;
+	return this->orgin.Y;
 }

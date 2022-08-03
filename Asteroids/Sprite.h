@@ -1,17 +1,20 @@
 #pragma once
+
+#include "Screen.h"
 #include <SDL.h>
 #include "SDL_image.h"
+#include <windows.h>
 #include <iostream>
 #include "string"
 #include <random>
 
-class CSprite
+class Sprite
 {
 public:
-	CSprite(SDL_Renderer* passed_renderer, std::string Path, int start_point_X, int start_point_Y, int change_direction_X, int change_direction_Y, int w, int h, int border[]);
-	~CSprite();
+	Sprite(SDL_Renderer* renderer, std::string path_to_image, COORD start_point, COORD direction, Uint16 width, Uint16 height);
+	~Sprite();
 
-	void Draw();
+	void Draw(SDL_Renderer* renderer);
 
 	void SetX(int X);
 	void SetY(int Y);
@@ -19,35 +22,22 @@ public:
 	int GetX();
 	int GetY();
 
-	void SetDirection(int new_direction_X, int new_direction_Y);
+	void SetDirection(COORD new_direction);
 	int GetDirectionX();
 	int GetDirectionY();
 
-	void Motion();
+	void Move(Screen _scr);
 
 	int GetOrginX();
 	int GetOrginY();
 
 private:
 	SDL_Texture* image;
-	SDL_Rect rect;
+	SDL_Rect location;
 
-	int orgin_X;
-	int orgin_Y;
-
-	int start_point_X;
-	int start_point_Y;
-
-	int direction_X;
-	int direction_Y;
-
-	int left_border_X;
-	int right_border_X;
-	int top_border_Y;
-	int bottom_border_Y;
+	COORD orgin;
+	COORD start_point;
+	COORD direction;
 
 	double final_counter;
-
-	SDL_Renderer* renderer;
 };
-
