@@ -37,32 +37,32 @@ Screen::Screen(Uint16 _width, Uint16 _height, Uint16 map_width, Uint16 map_heigh
 		throw "Failed GetStdHandle(): INVALID_HANDLE_VALUE";
 	}
 
-	if (!GetConsoleCursorInfo(m_console_handle, &m_old_cursor_info)) {
-		throw "Failed GetConsoleCursorInfo()";
-	}
+	//if (!GetConsoleCursorInfo(m_console_handle, &m_old_cursor_info)) {
+	//	throw "Failed GetConsoleCursorInfo()";
+	//}
 
-	m_current_cursor_info.dwSize = m_old_cursor_info.dwSize;
-	m_current_cursor_info.bVisible = m_old_cursor_info.bVisible;
+	//m_current_cursor_info.dwSize = m_old_cursor_info.dwSize;
+	//m_current_cursor_info.bVisible = m_old_cursor_info.bVisible;
 
-	CONSOLE_SCREEN_BUFFER_INFO csbi;
-	GetConsoleScreenBufferInfo(m_console_handle, &csbi);
-	m_old_text_attribute = csbi.wAttributes;
+	//CONSOLE_SCREEN_BUFFER_INFO csbi;
+	//GetConsoleScreenBufferInfo(m_console_handle, &csbi);
+	//m_old_text_attribute = csbi.wAttributes;
 }
 
 Screen::~Screen() {
-	SetConsoleCursorInfo(m_console_handle, &m_old_cursor_info);
-	SetConsoleTextAttribute(m_console_handle, m_old_text_attribute);
+	//SetConsoleCursorInfo(m_console_handle, &m_old_cursor_info);
+	//SetConsoleTextAttribute(m_console_handle, m_old_text_attribute);
 
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(win);
 }
 
-void Screen::SetCursorShow(bool visible) {
-	m_current_cursor_info.bVisible = visible;
-	if (!SetConsoleCursorInfo(m_console_handle, &m_current_cursor_info)) {
-		throw "Failed SetConsoleCursorInfo()";
-	}
-}
+//void Screen::SetCursorShow(bool visible) {
+//	m_current_cursor_info.bVisible = visible;
+//	if (!SetConsoleCursorInfo(m_console_handle, &m_current_cursor_info)) {
+//		throw "Failed SetConsoleCursorInfo()";
+//	}
+//}
 
 void Screen::SetTextAttribute(WORD attr) {
 	SetConsoleTextAttribute(m_console_handle, attr);
@@ -84,38 +84,43 @@ void Screen::ClearScreen() {
 	system("cls");
 }
 
-int Screen::GetWidth()
+short Screen::GetWidth()
 {
 	return width;
 }
 
-int Screen::GetHeight()
+short Screen::GetHeight()
 {
 	return height;
 }
 
-int Screen::GetMapWidth()
+short Screen::GetMapWidth()
 {
 	return map_width;
 }
 
-int Screen::GetMapHeight()
+short Screen::GetMapHeight()
 {
 	return map_height;
 }
-int Screen::GetTopBorder()
+short Screen::GetTopBorder()
 {
 	return top_border;
 }
-int Screen::GetLeftBorder()
+short Screen::GetLeftBorder()
 {
 	return left_border;
 }
-int Screen::GetBottomBorder()
+short Screen::GetBottomBorder()
 {
 	return bottom_border;
 }
-int Screen::GetRightBorder()
+short Screen::GetRightBorder()
 {
 	return right_border;
+}
+
+SDL_Renderer* Screen::GetRenderer()
+{
+	return renderer;
 }

@@ -13,29 +13,30 @@ class Screen
 public:
 	Screen(Uint16 _width, Uint16 _height, Uint16 map_width, Uint16 map_height);
 	~Screen();
-	void SetCursorShow(bool visible);                               // show/hide cursor
+	//void SetCursorShow(bool visible);                               // show/hide cursor
 	void SetTextAttribute(WORD attr);                               // set text/background color
 	void SetCursorPosition(int position_x, int position_y);         // cursor positioning
 	void PrintString(int position_x, int position_y, string text);  // character output
 	void ClearScreen();												// screen cleaning
 
-	int GetWidth();													// get screen width
-	int GetHeight();												// get screen height
-	int GetMapWidth();												// get map width
-	int GetMapHeight();												// get map height
-	int GetTopBorder();												// get screen height
-	int GetLeftBorder();											// get screen height
-	int GetBottomBorder();											// get screen height
-	int GetRightBorder();											// get screen height
+	short GetWidth();													// get screen width
+	short GetHeight();												// get screen height
+	short GetMapWidth();												// get map width
+	short GetMapHeight();												// get map height
+	short GetTopBorder();												// get screen height
+	short GetLeftBorder();											// get screen height
+	short GetBottomBorder();											// get screen height
+	short GetRightBorder();											// get screen height
+	SDL_Renderer* GetRenderer();											// get screen height
 
 private:
-	Uint16 width = 0, height = 0, map_width = 0, map_height = 0;		// playing field width and height
-	Uint16 top_border = 0, left_border = 0, bottom_border = 0, right_border = 0;		// playing field width and height
+	USHORT width = 0, height = 0, map_width = 0, map_height = 0;		// playing field width and height
+	USHORT top_border = 0, left_border = 0, bottom_border = 0, right_border = 0;		// playing field width and height
 	HANDLE m_console_handle = NULL;										// console handle
 	CONSOLE_CURSOR_INFO m_old_cursor_info = { 0 }, m_current_cursor_info = { 0 };	// old and new cursor info objects
-	WORD m_old_text_attribute = NULL;	
+	WORD m_old_text_attribute = NULL;	// old text attribute
 
 	SDL_Window* win = nullptr;
-	SDL_Renderer* renderer = nullptr;// old text attribute
+	SDL_Renderer* renderer = nullptr;
 };
 

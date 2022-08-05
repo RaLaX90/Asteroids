@@ -11,11 +11,11 @@ Game::Game(Screen& _scr, int _latency) :
 	}
 
 	m_generator = mt19937(m_rd());
-	m_distribution_screen_width = uniform_int_distribution<Uint16>(_scr.GetLeftBorder(), _scr.GetRightBorder());
-	m_distribution_screen_height = uniform_int_distribution<Uint16>(_scr.GetTopBorder(), _scr.GetBottomBorder());
+	m_distribution_screen_width = uniform_int_distribution<short>(_scr.GetLeftBorder(), _scr.GetRightBorder());
+	m_distribution_screen_height = uniform_int_distribution<short>(_scr.GetTopBorder(), _scr.GetBottomBorder());
 
-	m_distribution_direction_x = uniform_int_distribution<Uint8>(-5, 5);
-	m_distribution_direction_y = uniform_int_distribution<Uint8>(-5, 5);
+	m_distribution_direction_x = uniform_int_distribution<short>(-5, 5);
+	m_distribution_direction_y = uniform_int_distribution<short>(-5, 5);
 
 	duration_game = 0;
 
@@ -25,6 +25,14 @@ Game::Game(Screen& _scr, int _latency) :
 	cmd_table[2] = pair<int, Command>('M', CMD_RIGHT); // right arrow
 	cmd_table[3] = pair<int, Command>('H', CMD_UP);    // up arrow
 	cmd_table[4] = pair<int, Command>('P', CMD_DOWN);  // arrow to down
+
+	for (int i = 0; i < big_asteroids_number; i++) {
+		big_asteroids[i] = new Sprite(screen.GetRenderer(), "../data/big_asteroid.png", COORD{ m_distribution_screen_width(m_generator), m_distribution_screen_height(m_generator) }, COORD{ m_distribution_direction_x(m_generator), m_distribution_direction_y(m_generator) }, 40, 40);
+	}
+
+	background = new Sprite(screen.GetRenderer(), "../data/background.png", COORD{ screen.GetLeftBorder(), screen.GetRightBorder() }, COORD{ 0, 0 }, screen.GetMapWidth(), screen.GetMapHeight());
+
+	spaceship = new Sprite(screen.GetRenderer(), "../data/spaceship.png", COORD{ static_cast<short>(screen.GetWidth() / 2), static_cast<short>(screen.GetHeight() / 2) }, COORD{ 0, 0 }, 30, 30);
 }
 
 Game::~Game()
@@ -90,27 +98,27 @@ void Game::clearkeys()
 //	return food;
 //}
 
-void Game::drawGameField(string symbol) {
+void Game::drawGameField() {
 
 	screen.ClearScreen();
 
 	for (int i = 0; i < screen.GetHeight(); i++) {
 		if (i == 0 || i == screen.GetHeight() - 1) {
 			for (int j = 0; j < screen.GetWidth(); j++) {
-				screen.PrintString(j, i, symbol);
+				screen.PrintString(j, i, fieldBorderSymbol);
 			}
 		}
 		else {
-			screen.PrintString(0, i, symbol);
-			screen.PrintString(screen.GetWidth() - 1, i, symbol);
+			screen.PrintString(0, i, fieldBorderSymbol);
+			screen.PrintString(screen.GetWidth() - 1, i, fieldBorderSymbol);
 		}
 	}
 }
 
-void Game::printStatistics() {
-	screen.PrintString(0, screen.GetHeight(), "Length: " + to_string(snake.GetSnakeSize()));
-	screen.PrintString(12, screen.GetHeight(), "Game duration: " + to_string(duration_game));
-}
+//void Game::printStatistics() {
+//	screen.PrintString(0, screen.GetHeight(), "Length: " + to_string(snake.GetSnakeSize()));
+//	screen.PrintString(12, screen.GetHeight(), "Game duration: " + to_string(duration_game));
+//}
 
 void Game::WaitForClick(int position_x, int position_y) {
 	screen.PrintString(screen.GetWidth() / 2, screen.GetHeight() / 2, "Press any key for continue...");
@@ -141,99 +149,285 @@ void Game::EndGame() {
 	screen.PrintString(0, 0, "Snake " + ver_number);
 }
 
+void Game::swap_directions(Sprite* first, Sprite* second)
+{
+	auto temporary_direction_X = first->GetDirectionX();
+	auto temporary_direction_Y = first->GetDirectionY();
+	first->SetDirection(COORD{ second->GetDirectionX(), second->GetDirectionY() });
+	second->SetDirection(COORD{ temporary_direction_X, temporary_direction_X });
+}
+
+void Game::destruction(Sprite* first, Sprite* second)
+{
+	delete first;
+	first = NULL;
+
+	delete second;
+	second = NULL;
+}
+
+bool Game::IsCollision(Sprite* first, Sprite* second)
+{
+	if (((((first->GetX() + first->GetOrginX()) - (second->GetX() + second->GetOrginX())) * ((first->GetX() + first->GetOrginX()) - (second->GetX() + second->GetOrginX())))
+		+ (((first->GetY() + first->GetOrginY()) - (second->GetY() + second->GetOrginY())) * ((first->GetY() + first->GetOrginY()) - (second->GetY() + second->GetOrginY())))) < 2 * 30 * 30) {
+
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
 void Game::StartGameLoop(int mode_number) {
 
 	duration_game = 0;
 
-	//thread th(drawGameField, );
-	drawGameField("#");           // draw the playing field
+	//thread th(drawGameField);
+	drawGameField();           // draw the playing field
 	//th.join();
-
-	COORD snake_start_position{ screen.GetWidth() / 2, screen.GetHeight() / 2 };
-	snake.Reset(snake_start_position);				// set snake: length 2,
-													// position - in the middle of the playing field,
-													// direction - left
-	snake.Draw(screen);                    // initial snake drawing
 
 	Command cmd = CMD_NOCOMMAND;
 	State state = STATE_OK;
 	// delta contains the coordinate increment (dx, dy) for each snake move across the field
 	COORD delta{ -1, 0 };                // initial movement - to the left
-	COORD food = createFood();          // calculate food coordinates
+	//COORD food = createFood();          // calculate food coordinates
 	//screen.PrintString(food.X, food.Y, food_symbol);      // display food on the screen
 
-	printStatistics();                       // display the initial statistics of the game
+	//printStatistics();                       // display the initial statistics of the game
 
 	clock_t time1, time2, duration;
 	time1 = clock();
+	int mouse_x = 0, mouse_y = 0;
+	SDL_Event e;
+	bool MoveUp = false;
+	bool MoveDown = false;
+	bool MoveLeft = false;
+	bool MoveRight = false;
+
+	int timeCheck = SDL_GetTicks();
+	double speed_up = 0;
+	double speed_left = 0;
+	double speed_down = 0;
+	double speed_right = 0;
+
+	bool is_shot_allowed = true;
+	int StartTick = 0;
+
+	std::string str, s1, s2;
+	int SCREEN_WIDTH = 0, SCREEN_HEIGHT = 0, MAP_WIDTH = 0, MAP_HEIGHT = 0, big_asteroids_number = 0, small_asteroids_count = 0;
 
 	do {
+		SDL_GetMouseState(&mouse_x, &mouse_y);
+		// Event handling
+		while (SDL_PollEvent(&e)) {
 
-		if (_kbhit()) {					// if there is information in the keyboard buffer,
-			cmd = getCommand();        // then accept the command
-		}
-
-		// обработка команд
-		switch (cmd) {
-		case CMD_LEFT: {
-			if (delta.X != 1 && delta.Y != 0) {
-				delta = COORD{ -1, 0 };
+			if (e.type == SDL_KEYDOWN) {
+				switch (e.key.keysym.sym) {
+				case SDLK_ESCAPE: {
+					state = STATE_EXIT;
+					break;
+				}
+				case SDLK_w: {
+					MoveUp = true;
+					break;
+				}
+				case SDLK_a: {
+					MoveLeft = true;
+					break;
+				}
+				case SDLK_s: {
+					MoveDown = true;
+					break;
+				}
+				case SDLK_d: {
+					MoveRight = true;
+					break;
+				}
+				default: {
+					break;
+				}
+				}
 			}
-			break;
-		}
-		case CMD_RIGHT: {
-			if (delta.X != -1 && delta.Y != 0) {
-				delta = COORD{ 1, 0 };
-			}
-			break;
-		}
-		case CMD_UP: {
-			if (delta.X != 0 && delta.Y != -1) {
-				delta = COORD{ 0, -1 };
-			}
-			break;
-		}
-		case CMD_DOWN: {
-			if (delta.X != 0 && delta.Y != 1) {
-				delta = COORD{ 0, 1 };
-			}
-			break;
-		}
-		case CMD_EXIT: {
-			state = STATE_EXIT;
-			break;
-		}
-		default: {
-			break;
-		}
-		};
-
-		snake.Move(delta, screen, mode_number);     // move the snake to delta
-
-		COORD snake_head_coordinate = snake.GetSnakeHeadCoordinate();   // snake head coordinate
-
-		// if the snake's head collides with the field boundary or with the snake's body, then the snake dies
-		if (snake_head_coordinate.X == 0 || snake_head_coordinate.X == screen.GetWidth() - 1 || snake_head_coordinate.Y == 0 || snake_head_coordinate.Y == screen.GetHeight() - 1 || snake.IsInSnakeBody(snake_head_coordinate)) {
-			state = STATE_DIED;
-		}
-
-		if (state == STATE_OK) {          // if the snake is still alive, then
-			if (snake.GetSnakeHeadCoordinate().X == food.X && snake.GetSnakeHeadCoordinate().Y == food.Y) { // if the coordinate of the snake's head is the same as the coordinate of the food, then
-				snake.Grow(food, 3);    // increase the length of the snake
-
-				food = createFood();     // calculate the coordinates of the new food
-				//screen.PrintString(food.X, food.Y, food_symbol); // bring food to the screen
-
-				time2 = clock();
-				duration = time2 - time1;
-				duration_game += static_cast<double>(duration) / CLOCKS_PER_SEC;
-
-				printStatistics();           // output of current game statistics
+			if (e.type == SDL_KEYUP) {
+				switch (e.key.keysym.sym) {
+				case SDLK_w: {
+					MoveUp = false;
+					speed_up = 4;
+					break;
+				}
+				case SDLK_a: {
+					MoveLeft = false;
+					speed_left = 4;
+					break;
+				}
+				case SDLK_s: {
+					MoveDown = false;
+					speed_down = 4;
+					break;
+				}
+				case SDLK_d: {
+					MoveRight = false;
+					speed_right = 4;
+					break;
+				}
+				default: {
+					break;
+				}
+				}
 			}
 
-			snake.Draw(screen);			// drawing a snake
-			Sleep(latency);             // delay before next position change
+			if (e.type == SDL_MOUSEBUTTONDOWN) {
+				if (e.button.button == SDL_BUTTON_LEFT) {
+					if (is_shot_allowed) {
+						bullet = new Sprite(screen.GetRenderer(), "../data/bullet.png", COORD{ static_cast<short>(spaceship->GetX() + 10), static_cast<short>(spaceship->GetY() + 10) }, COORD{ static_cast<short>(mouse_x), static_cast<short>(mouse_y) }, 20, 20);
+					}
+				}
+			}
 		}
+
+		if (spaceship != NULL) {
+			if (timeCheck + 10 < (int)SDL_GetTicks()) {
+
+				if (MoveUp) {
+					spaceship->SetY(spaceship->GetY() - 4);
+				}
+				else if (!MoveUp && (speed_up > 0)) {
+					spaceship->SetY(spaceship->GetY() - speed_up);
+					speed_up -= 0.1;
+				}
+
+				if (MoveLeft) {
+					spaceship->SetX(spaceship->GetX() - 4);
+				}
+				else if (!MoveLeft && speed_left > 0) {
+					spaceship->SetX(spaceship->GetX() - speed_left);
+					speed_left -= 0.1;
+				}
+
+				if (MoveDown) {
+					spaceship->SetY(spaceship->GetY() + 4);
+				}
+				else if (!MoveDown && speed_down > 0) {
+					spaceship->SetY(spaceship->GetY() + speed_down);
+					speed_down -= 0.1;
+				}
+
+				if (MoveRight) {
+					spaceship->SetX(spaceship->GetX() + 4);
+				}
+				else if (!MoveRight && speed_right > 0) {
+					spaceship->SetX(spaceship->GetX() + speed_right);
+					speed_right -= 0.1;
+				}
+
+				if ((spaceship->GetX() + spaceship->GetOrginX()) < screen.GetLeftBorder()) {
+					spaceship->SetX(screen.GetRightBorder() - spaceship->GetOrginX());
+				}
+				else if ((spaceship->GetX() + spaceship->GetOrginX()) > screen.GetRightBorder()) {
+					spaceship->SetX(screen.GetLeftBorder() - spaceship->GetOrginX());
+				}
+				else if ((spaceship->GetY() + spaceship->GetOrginY()) < screen.GetTopBorder()) {
+					spaceship->SetY(screen.GetBottomBorder() - spaceship->GetOrginY());
+				}
+				else if (((spaceship->GetY() + spaceship->GetOrginY()) > screen.GetBottomBorder())) {
+					spaceship->SetY(screen.GetTopBorder() - spaceship->GetOrginY());
+				}
+
+				timeCheck = (int)SDL_GetTicks();
+			}
+		}
+
+		// Scene showing
+		SDL_RenderClear(screen.GetRenderer());
+
+		background->Draw(screen.GetRenderer());
+
+		if (spaceship == NULL) {
+			if ((SDL_GetTicks() - StartTick) >= 1000) {
+				spaceship = new Sprite(screen.GetRenderer(), "../data/spaceship.png", COORD{ static_cast<short>(screen.GetWidth() / 2), static_cast<short>(screen.GetHeight() / 2) }, COORD{ 0, 0 }, 30, 30);
+				is_shot_allowed = true;
+			}
+		}
+		else {
+
+			spaceship->Draw(screen.GetRenderer());
+
+			if (bullet != NULL) {
+				bullet->Move(screen);
+				bullet->Draw(screen.GetRenderer());
+			}
+
+			for (int i = 0; i < big_asteroids_number * 2; i++) {
+				if (i < big_asteroids_number) {
+					if (big_asteroids[i] != NULL) {
+						big_asteroids[i]->Move(screen);
+
+						//spaceship vs big
+						if (IsCollision(spaceship, big_asteroids[i])) {
+							destruction(spaceship, big_asteroids[i]);
+							StartTick = SDL_GetTicks();
+							is_shot_allowed = false;
+							break;
+						}
+
+						//big vs big
+						for (int j = i + 1; j < big_asteroids_number - 1; j++) {
+							if (big_asteroids[j] != NULL) {
+								if (IsCollision(big_asteroids[i], big_asteroids[j])) {
+									swap_directions(big_asteroids[i], big_asteroids[j]);
+								}
+							}
+						}
+
+						big_asteroids[i]->Draw(screen.GetRenderer());
+
+						//bullet vs big
+						if (bullet != NULL) {
+							if (IsCollision(bullet, big_asteroids[i])) {
+								small_asteroids[small_asteroids_count] = new Sprite(screen.GetRenderer(), "../data/small_asteroid.png", COORD{ static_cast<short>(big_asteroids[i]->GetX() + 15), static_cast<short>(big_asteroids[i]->GetY() + 50) }, COORD{ static_cast<short>(big_asteroids[i]->GetDirectionX() / 2), static_cast<short>(big_asteroids[i]->GetDirectionY() * 2) }, 30, 30);
+								small_asteroids_count++;
+								small_asteroids[small_asteroids_count] = new Sprite(screen.GetRenderer(), "../data/small_asteroid.png", COORD{ static_cast<short>(big_asteroids[i]->GetX() + 50), static_cast<short>(big_asteroids[i]->GetY() + 15) }, COORD{ static_cast<short>(big_asteroids[i]->GetDirectionX() * 2), static_cast<short>(big_asteroids[i]->GetDirectionY() / 2) }, 30, 30);
+								small_asteroids_count++;
+
+								destruction(bullet, big_asteroids[i]);
+								break;
+							}
+						}
+					}
+				}
+
+				if (small_asteroids[i] != NULL) {
+					small_asteroids[i]->Move(screen);
+
+					for (int j = 0; j < big_asteroids_number; j++) {
+						if (big_asteroids[j] != NULL) {
+							if (IsCollision(small_asteroids[i], big_asteroids[j])) {
+								swap_directions(small_asteroids[i], big_asteroids[j]);
+							}
+						}
+					}
+
+					for (int j = 0; j < big_asteroids_number * 2; j++) {
+						if (small_asteroids[j] != NULL && i != j) {
+							if (IsCollision(small_asteroids[i], small_asteroids[j])) {
+								swap_directions(small_asteroids[i], small_asteroids[j]);
+							}
+						}
+					}
+
+					small_asteroids[i]->Draw(screen.GetRenderer());
+
+					if (bullet != NULL) {
+						if (IsCollision(bullet, small_asteroids[i])) {
+							destruction(bullet, small_asteroids[i]);
+							break;
+						}
+					}
+				}
+			}
+		}
+
+		SDL_RenderPresent(screen.GetRenderer());
 
 	} while (state == STATE_OK);          // play while the snake is alive
 

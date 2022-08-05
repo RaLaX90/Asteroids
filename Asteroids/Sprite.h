@@ -11,7 +11,7 @@
 class Sprite
 {
 public:
-	Sprite(SDL_Renderer* renderer, std::string path_to_image, COORD start_point, COORD direction, Uint16 width, Uint16 height);
+	Sprite(SDL_Renderer* renderer, const char* path_to_image, COORD start_point, COORD direction, short width, short height);
 	~Sprite();
 
 	void Draw(SDL_Renderer* renderer);
@@ -23,13 +23,13 @@ public:
 	int GetY();
 
 	void SetDirection(COORD new_direction);
-	int GetDirectionX();
-	int GetDirectionY();
+	short GetDirectionX();
+	short GetDirectionY();
 
 	void Move(Screen _scr);
 
-	int GetOrginX();
-	int GetOrginY();
+	short GetOrginX();
+	short GetOrginY();
 
 private:
 	SDL_Texture* image;

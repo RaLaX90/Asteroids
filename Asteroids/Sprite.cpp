@@ -1,6 +1,6 @@
 #include "Sprite.h"
 
-Sprite::Sprite(SDL_Renderer* renderer, const char* path_to_image, COORD start_point, COORD direction, Uint16 width, Uint16 height)
+Sprite::Sprite(SDL_Renderer* renderer, const char* path_to_image, COORD start_point, COORD direction, short width, short height)
 {
 	this->orgin.X = width / 2;
 	this->orgin.Y = height / 2;
@@ -16,7 +16,7 @@ Sprite::Sprite(SDL_Renderer* renderer, const char* path_to_image, COORD start_po
 	this->image = IMG_LoadTexture(renderer, path_to_image);
 	if (!image)
 	{
-		std::cout << IMG_GetError(); //Can be replaced by SDL_GetError()
+		std::cerr << IMG_GetError(); //Can be replaced by SDL_GetError()
 	}
 
 	this->location.x = start_point.X;
@@ -60,12 +60,12 @@ void Sprite::SetDirection(COORD new_direction)
 	this->direction.Y = new_direction.Y;
 }
 
-int Sprite::GetDirectionX()
+short Sprite::GetDirectionX()
 {
 	return this->direction.X;
 }
 
-int Sprite::GetDirectionY()
+short Sprite::GetDirectionY()
 {
 	return this->direction.Y;
 }
@@ -97,12 +97,12 @@ void Sprite::Move(Screen _scr)
 	}
 }
 
-int Sprite::GetOrginX()
+short Sprite::GetOrginX()
 {
 	return this->orgin.X;
 }
 
-int Sprite::GetOrginY()
+short Sprite::GetOrginY()
 {
 	return this->orgin.Y;
 }
