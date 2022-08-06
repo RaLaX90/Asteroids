@@ -3,7 +3,7 @@
 // Constructor
 // _scr - an object that outputs to the console
 // _latency - delay between position changes in milliseconds
-Game::Game(Screen& _scr, int _latency) :
+Game::Game(Screen& _scr, Uint8 _latency) :
 	screen(_scr), latency(_latency) {
 
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
@@ -120,7 +120,7 @@ void Game::drawGameField() {
 //	screen.PrintString(12, screen.GetHeight(), "Game duration: " + to_string(duration_game));
 //}
 
-void Game::WaitForClick(int position_x, int position_y) {
+void Game::WaitForClick(short position_x, short position_y) {
 	screen.PrintString(screen.GetWidth() / 2, screen.GetHeight() / 2, "Press any key for continue...");
 	_getch();
 	clearkeys();
@@ -154,16 +154,16 @@ void Game::swap_directions(Sprite* first, Sprite* second)
 	auto temporary_direction_X = first->GetDirectionX();
 	auto temporary_direction_Y = first->GetDirectionY();
 	first->SetDirection(COORD{ second->GetDirectionX(), second->GetDirectionY() });
-	second->SetDirection(COORD{ temporary_direction_X, temporary_direction_X });
+	second->SetDirection(COORD{ temporary_direction_X, temporary_direction_Y });
 }
 
-void Game::destruction(Sprite* first, Sprite* second)
+void Game::destruction(Sprite*& first, Sprite*& second)
 {
 	delete first;
-	first = NULL;
+	first = nullptr;
 
 	delete second;
-	second = NULL;
+	second = nullptr;
 }
 
 bool Game::IsCollision(Sprite* first, Sprite* second)
@@ -214,7 +214,7 @@ void Game::StartGameLoop(int mode_number) {
 	int StartTick = 0;
 
 	std::string str, s1, s2;
-	int SCREEN_WIDTH = 0, SCREEN_HEIGHT = 0, MAP_WIDTH = 0, MAP_HEIGHT = 0, big_asteroids_number = 0, small_asteroids_count = 0;
+	int /*SCREEN_WIDTH = 0, SCREEN_HEIGHT = 0, MAP_WIDTH = 0, MAP_HEIGHT = 0, */big_asteroids_count = 5, small_asteroids_count = 10;
 
 	do {
 		SDL_GetMouseState(&mouse_x, &mouse_y);
@@ -248,6 +248,7 @@ void Game::StartGameLoop(int mode_number) {
 				}
 				}
 			}
+
 			if (e.type == SDL_KEYUP) {
 				switch (e.key.keysym.sym) {
 				case SDLK_w: {
@@ -285,7 +286,7 @@ void Game::StartGameLoop(int mode_number) {
 			}
 		}
 
-		if (spaceship != NULL) {
+		if (spaceship != nullptr) {
 			if (timeCheck + 10 < (int)SDL_GetTicks()) {
 
 				if (MoveUp) {
@@ -342,7 +343,7 @@ void Game::StartGameLoop(int mode_number) {
 
 		background->Draw(screen.GetRenderer());
 
-		if (spaceship == NULL) {
+		if (spaceship == nullptr) {
 			if ((SDL_GetTicks() - StartTick) >= 1000) {
 				spaceship = new Sprite(screen.GetRenderer(), "../data/spaceship.png", COORD{ static_cast<short>(screen.GetWidth() / 2), static_cast<short>(screen.GetHeight() / 2) }, COORD{ 0, 0 }, 30, 30);
 				is_shot_allowed = true;
@@ -352,14 +353,14 @@ void Game::StartGameLoop(int mode_number) {
 
 			spaceship->Draw(screen.GetRenderer());
 
-			if (bullet != NULL) {
+			if (bullet != nullptr) {
 				bullet->Move(screen);
 				bullet->Draw(screen.GetRenderer());
 			}
 
-			for (int i = 0; i < big_asteroids_number * 2; i++) {
-				if (i < big_asteroids_number) {
-					if (big_asteroids[i] != NULL) {
+			for (int i = 0; i < big_asteroids_count * 2; i++) {
+				if (i < big_asteroids_count) {
+					if (big_asteroids[i] != nullptr) {
 						big_asteroids[i]->Move(screen);
 
 						//spaceship vs big
@@ -371,8 +372,8 @@ void Game::StartGameLoop(int mode_number) {
 						}
 
 						//big vs big
-						for (int j = i + 1; j < big_asteroids_number - 1; j++) {
-							if (big_asteroids[j] != NULL) {
+						for (int j = i + 1; j < big_asteroids_count - 1; j++) {
+							if (big_asteroids[j] != nullptr) {
 								if (IsCollision(big_asteroids[i], big_asteroids[j])) {
 									swap_directions(big_asteroids[i], big_asteroids[j]);
 								}
@@ -382,7 +383,7 @@ void Game::StartGameLoop(int mode_number) {
 						big_asteroids[i]->Draw(screen.GetRenderer());
 
 						//bullet vs big
-						if (bullet != NULL) {
+						if (bullet != nullptr) {
 							if (IsCollision(bullet, big_asteroids[i])) {
 								small_asteroids[small_asteroids_count] = new Sprite(screen.GetRenderer(), "../data/small_asteroid.png", COORD{ static_cast<short>(big_asteroids[i]->GetX() + 15), static_cast<short>(big_asteroids[i]->GetY() + 50) }, COORD{ static_cast<short>(big_asteroids[i]->GetDirectionX() / 2), static_cast<short>(big_asteroids[i]->GetDirectionY() * 2) }, 30, 30);
 								small_asteroids_count++;
@@ -396,19 +397,19 @@ void Game::StartGameLoop(int mode_number) {
 					}
 				}
 
-				if (small_asteroids[i] != NULL) {
+				if (small_asteroids[i] != nullptr) {
 					small_asteroids[i]->Move(screen);
 
-					for (int j = 0; j < big_asteroids_number; j++) {
-						if (big_asteroids[j] != NULL) {
+					for (int j = 0; j < big_asteroids_count; j++) {
+						if (big_asteroids[j] != nullptr) {
 							if (IsCollision(small_asteroids[i], big_asteroids[j])) {
 								swap_directions(small_asteroids[i], big_asteroids[j]);
 							}
 						}
 					}
 
-					for (int j = 0; j < big_asteroids_number * 2; j++) {
-						if (small_asteroids[j] != NULL && i != j) {
+					for (int j = 0; j < big_asteroids_count * 2; j++) {
+						if (small_asteroids[j] != nullptr && i != j) {
 							if (IsCollision(small_asteroids[i], small_asteroids[j])) {
 								swap_directions(small_asteroids[i], small_asteroids[j]);
 							}
@@ -417,7 +418,7 @@ void Game::StartGameLoop(int mode_number) {
 
 					small_asteroids[i]->Draw(screen.GetRenderer());
 
-					if (bullet != NULL) {
+					if (bullet != nullptr) {
 						if (IsCollision(bullet, small_asteroids[i])) {
 							destruction(bullet, small_asteroids[i]);
 							break;
@@ -431,8 +432,8 @@ void Game::StartGameLoop(int mode_number) {
 
 	} while (state == STATE_OK);          // play while the snake is alive
 
-	screen.PrintString(screen.GetWidth() / 2 - 8, 10, " G a m e    o v e r ");
-	clearkeys();
-	_getch();
-	clearkeys();
+	//screen.PrintString(screen.GetWidth() / 2 - 8, 10, " G a m e    o v e r ");
+	//clearkeys();
+	//_getch();
+	//clearkeys();
 }

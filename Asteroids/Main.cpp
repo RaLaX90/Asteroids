@@ -381,24 +381,24 @@ int main(int argc, char* argv[]) {
 
 		// display a suggestion for choosing a game mode, if the user has not chosen what we want - repeat the output
 		int ch = 0;
-		bool rightChoose = false;
-		do
-		{
-			screen.ClearScreen();
-			screen.PrintString(0, 0, "Choose game mode and press enter (other answers are not accepted):");
-			screen.PrintString(0, 1, "1) Easy (the snake can pass through the borders of the map)");
-			screen.PrintString(0, 2, "2) Middle (the snake will die when crossing the border of the map)");
-			screen.PrintString(0, 3, "");
-			ch = cin.get();
-			if (ch == 49 || ch == 50) {
-				rightChoose = true;
-			}
-		} while (!rightChoose);
+		//bool rightChoose = false;
+		//do
+		//{
+		//	screen.ClearScreen();
+		//	screen.PrintString(0, 0, "Choose game mode and press enter (other answers are not accepted):");
+		//	screen.PrintString(0, 1, "1) Easy (the snake can pass through the borders of the map)");
+		//	screen.PrintString(0, 2, "2) Middle (the snake will die when crossing the border of the map)");
+		//	screen.PrintString(0, 3, "");
+		//	ch = cin.get();
+		//	if (ch == 49 || ch == 50) {
+		//		rightChoose = true;
+		//	}
+		//} while (!rightChoose);
 
-		do {
+		//do {
 			game.StartGameLoop(ch);
 
-		} while (game.IsOnceMore());
+		//} while (game.IsOnceMore());
 
 		game.EndGame();
 	}

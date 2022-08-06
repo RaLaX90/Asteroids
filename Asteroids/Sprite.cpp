@@ -70,7 +70,7 @@ short Sprite::GetDirectionY()
 	return this->direction.Y;
 }
 
-void Sprite::Move(Screen _scr)
+void Sprite::Move(Screen& _scr)
 {
 	if ((this->location.x + this->GetOrginX()) < _scr.GetLeftBorder()) {
 		this->location.x = _scr.GetRightBorder() - this->GetOrginX();

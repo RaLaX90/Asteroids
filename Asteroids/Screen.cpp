@@ -2,7 +2,7 @@
 
 // _width - playing field width (x)
 // _height - height of the playing field (y)
-Screen::Screen(Uint16 _width, Uint16 _height, Uint16 map_width, Uint16 map_height) {
+Screen::Screen(short _width, short _height, short _map_width, short _map_height) {
 
 	//if width and height = 0 then set him to default teminal size
 	if (_width == 0 && _height == 0) {
@@ -31,6 +31,9 @@ Screen::Screen(Uint16 _width, Uint16 _height, Uint16 map_width, Uint16 map_heigh
 	left_border = (_height / 2) - (map_height / 2);
 	bottom_border = (_height / 2) + (map_height / 2);
 	right_border = (_height / 2) + (map_height / 2);
+
+	map_width = _map_width;
+	map_height = _map_height;
 
 	m_console_handle = GetStdHandle(STD_OUTPUT_HANDLE);
 	if (m_console_handle == INVALID_HANDLE_VALUE) {
@@ -68,13 +71,13 @@ void Screen::SetTextAttribute(WORD attr) {
 	SetConsoleTextAttribute(m_console_handle, attr);
 }
 
-void Screen::SetCursorPosition(int position_x, int position_y)
+void Screen::SetCursorPosition(short position_x, short position_y)
 {
 	COORD pos = { position_x, position_y };
 	SetConsoleCursorPosition(m_console_handle, pos);
 }
 
-void Screen::PrintString(int position_x, int position_y, string text)
+void Screen::PrintString(short position_x, short position_y, string text)
 {
 	SetCursorPosition(position_x, position_y);
 	cout << text;

@@ -26,7 +26,7 @@ public:
 	short GetDirectionX();
 	short GetDirectionY();
 
-	void Move(Screen _scr);
+	void Move(Screen& _scr);
 
 	short GetOrginX();
 	short GetOrginY();

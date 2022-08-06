@@ -15,15 +15,15 @@ using namespace std;
 class Game
 {
 public:
-	Game(Screen& _scr, int _latency = 100);
+	Game(Screen& _scr, Uint8 _latency = 100);
 	~Game();
 	void StartGameLoop(int mode_number);				// main game loop
 	bool IsOnceMore();									// displaying a request and receiving a response from the player
-	void WaitForClick(int position_x, int position_y);  // wait for user response
+	void WaitForClick(short position_x, short position_y);  // wait for user response
 	void PrintLogo();									// print logo
 	void EndGame();										// output text at the end of the game
 	void swap_directions(Sprite* first, Sprite* second);
-	void destruction(Sprite* first, Sprite* second);
+	void destruction(Sprite*& first, Sprite*& second);
 	bool IsCollision(Sprite* first, Sprite* second);
 
 private:
@@ -40,7 +40,7 @@ private:
 	string ver_number = "v 1.0";
 	string fieldBorderSymbol = "#";
 
-	Uint8 big_asteroids_number = 0;
+	Uint8 big_asteroids_number = 5;
 	Sprite* bullet = nullptr;
 	vector<Sprite*> big_asteroids{ big_asteroids_number, nullptr };
 	vector<Sprite*> small_asteroids{ big_asteroids_number * 2, nullptr };
