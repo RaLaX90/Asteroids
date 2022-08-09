@@ -36,7 +36,7 @@ private:
 	Uint8 latency;										// delay between position changes in milliseconds
 	Screen screen;										// screen object
 	//Snake snake;										// snake object
-	double duration_game;								// duration
+	clock_t duration;									// game duration
 	string ver_number = "v 1.0";
 	string fieldBorderSymbol = "#";
 

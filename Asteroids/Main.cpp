@@ -68,12 +68,12 @@ int main(int argc, char* argv[]) {
 	//	big_asteroids_number = 5;
 	//}
 
-	//int top_border = (SCREEN_HEIGHT / 2) - (MAP_HEIGHT / 2);
-	//int left_border = (SCREEN_WIDTH / 2) - (MAP_WIDTH / 2);
-	//int bottom_border = (SCREEN_HEIGHT / 2) + (MAP_HEIGHT / 2);
-	//int right_border = (SCREEN_WIDTH / 2) + (MAP_WIDTH / 2);
+	//int top_border_Y = (SCREEN_HEIGHT / 2) - (MAP_HEIGHT / 2);
+	//int left_border_X = (SCREEN_WIDTH / 2) - (MAP_WIDTH / 2);
+	//int bottom_border_Y = (SCREEN_HEIGHT / 2) + (MAP_HEIGHT / 2);
+	//int right_border_X = (SCREEN_WIDTH / 2) + (MAP_WIDTH / 2);
 
-	//int border[4] = { top_border, left_border, bottom_border, right_border };
+	//int border[4] = { top_border_Y, left_border_X, bottom_border_Y, right_border_X };
 
 	//bool is_shot_allowed = true;
 	//int StartTick = 0;
@@ -96,8 +96,8 @@ int main(int argc, char* argv[]) {
 	//}
 
 	//std::mt19937 gen(std::random_device().operator()());
-	//std::uniform_int_distribution<int> uid1(left_border, right_border);
-	//std::uniform_int_distribution<int> uid2(top_border, bottom_border);
+	//std::uniform_int_distribution<int> uid1(left_border_X, right_border_X);
+	//std::uniform_int_distribution<int> uid2(top_border_Y, bottom_border_Y);
 
 	//std::uniform_int_distribution<int> uid3(-5, 5);
 	//std::uniform_int_distribution<int> uid4(-5, 5);
@@ -111,7 +111,7 @@ int main(int argc, char* argv[]) {
 	//	big_asteroids[i] = new Sprite(renderer, "../data/big_asteroid.png", uid1(gen), uid2(gen), uid3(gen), uid4(gen), 40, 40, border);
 	//}
 
-	//Sprite* background = new Sprite(renderer, "../data/background.png", left_border, top_border, 0, 0, MAP_WIDTH, MAP_HEIGHT, border);
+	//Sprite* background = new Sprite(renderer, "../data/background.png", left_border_X, top_border_Y, 0, 0, MAP_WIDTH, MAP_HEIGHT, border);
 
 	//Sprite* spaceship = new Sprite(renderer, "../data/spaceship.png", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0, 0, 30, 30, border);
 
@@ -235,17 +235,17 @@ int main(int argc, char* argv[]) {
 	//				speed_right -= 0.1;
 	//			}
 
-	//			if ((spaceship->GetX() + spaceship->GetOrginX()) < left_border) {
-	//				spaceship->SetX(right_border - spaceship->GetOrginX());
+	//			if ((spaceship->GetX() + spaceship->GetOrginX()) < left_border_X) {
+	//				spaceship->SetX(right_border_X - spaceship->GetOrginX());
 	//			}
-	//			else if ((spaceship->GetX() + spaceship->GetOrginX()) > (right_border)) {
-	//				spaceship->SetX(left_border - spaceship->GetOrginX());
+	//			else if ((spaceship->GetX() + spaceship->GetOrginX()) > (right_border_X)) {
+	//				spaceship->SetX(left_border_X - spaceship->GetOrginX());
 	//			}
-	//			else if ((spaceship->GetY() + spaceship->GetOrginY()) < top_border) {
-	//				spaceship->SetY(bottom_border - spaceship->GetOrginY());
+	//			else if ((spaceship->GetY() + spaceship->GetOrginY()) < top_border_Y) {
+	//				spaceship->SetY(bottom_border_Y - spaceship->GetOrginY());
 	//			}
-	//			else if (((spaceship->GetY() + spaceship->GetOrginY()) > bottom_border)) {
-	//				spaceship->SetY(top_border - spaceship->GetOrginY());
+	//			else if (((spaceship->GetY() + spaceship->GetOrginY()) > bottom_border_Y)) {
+	//				spaceship->SetY(top_border_Y - spaceship->GetOrginY());
 	//			}
 
 	//			timeCheck = (int)SDL_GetTicks();
@@ -369,11 +369,11 @@ int main(int argc, char* argv[]) {
 
 	try
 	{
-		Screen screen(1920, 1080, 600, 600);
+		Screen screen{ 1920, 1080, 900, 600 };
 		//screen.SetCursorShow(false);
 		screen.SetTextAttribute((WORD)0x0a);
 		screen.ClearScreen();
-		Game game(screen, 120);
+		Game game{ screen, 120 };
 
 		game.PrintLogo();
 

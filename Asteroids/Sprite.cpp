@@ -72,17 +72,17 @@ short Sprite::GetDirectionY()
 
 void Sprite::Move(Screen& _scr)
 {
-	if ((this->location.x + this->GetOrginX()) < _scr.GetLeftBorder()) {
-		this->location.x = _scr.GetRightBorder() - this->GetOrginX();
+	if ((this->location.x + this->GetOrginX()) < _scr.GetLeftBorderX()) {
+		this->location.x = _scr.GetRightBorderX() - this->GetOrginX();
 	}
-	else if ((this->location.x + this->GetOrginX()) > _scr.GetRightBorder()) {
-		this->location.x = _scr.GetLeftBorder() - this->GetOrginX();
+	else if ((this->location.x + this->GetOrginX()) > _scr.GetRightBorderX()) {
+		this->location.x = _scr.GetLeftBorderX() - this->GetOrginX();
 	}
-	else if ((this->location.y + this->GetOrginY()) < _scr.GetTopBorder()) {
-		this->location.y = _scr.GetBottomBorder() - this->GetOrginY();
+	else if ((this->location.y + this->GetOrginY()) < _scr.GetTopBorderY()) {
+		this->location.y = _scr.GetBottomBorderY() - this->GetOrginY();
 	}
-	else if ((this->location.y + this->GetOrginY()) > _scr.GetBottomBorder()) {
-		this->location.y = _scr.GetTopBorder() - this->GetOrginY();
+	else if ((this->location.y + this->GetOrginY()) > _scr.GetBottomBorderY()) {
+		this->location.y = _scr.GetTopBorderY() - this->GetOrginY();
 	}
 	else {
 		if (this->location.w == 20) {

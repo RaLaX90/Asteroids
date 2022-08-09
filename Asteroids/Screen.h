@@ -23,15 +23,15 @@ public:
 	short GetHeight();												// get screen height
 	short GetMapWidth();												// get map width
 	short GetMapHeight();												// get map height
-	short GetTopBorder();												// get screen height
-	short GetLeftBorder();											// get screen height
-	short GetBottomBorder();											// get screen height
-	short GetRightBorder();											// get screen height
+	short GetTopBorderY();												// get screen height
+	short GetLeftBorderX();											// get screen height
+	short GetBottomBorderY();											// get screen height
+	short GetRightBorderX();											// get screen height
 	SDL_Renderer* GetRenderer();											// get screen height
 
 private:
 	short width = 0, height = 0, map_width = 0, map_height = 0;		// playing field width and height
-	short top_border = 0, left_border = 0, bottom_border = 0, right_border = 0;		// playing field width and height
+	short top_border_Y = 0, left_border_X = 0, bottom_border_Y = 0, right_border_X = 0;		// playing field width and height
 	HANDLE m_console_handle = NULL;										// console handle
 	CONSOLE_CURSOR_INFO m_old_cursor_info = { 0 }, m_current_cursor_info = { 0 };	// old and new cursor info objects
 	WORD m_old_text_attribute = NULL;	// old text attribute

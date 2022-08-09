@@ -27,10 +27,10 @@ Screen::Screen(short _width, short _height, short _map_width, short _map_height)
 		std::cout << "SDL_CreateRenderer Error: " << SDL_GetError() << std::endl;
 	}
 
-	top_border = (_height / 2) - (map_height / 2);
-	left_border = (_height / 2) - (map_height / 2);
-	bottom_border = (_height / 2) + (map_height / 2);
-	right_border = (_height / 2) + (map_height / 2);
+	top_border_Y = (_height / 2) - (_map_height / 2);
+	left_border_X = (_width / 2) - (_map_width / 2);
+	bottom_border_Y = (_height / 2) + (_map_height / 2);
+	right_border_X = (_width / 2) + (_map_width / 2);
 
 	map_width = _map_width;
 	map_height = _map_height;
@@ -106,21 +106,21 @@ short Screen::GetMapHeight()
 {
 	return map_height;
 }
-short Screen::GetTopBorder()
+short Screen::GetTopBorderY()
 {
-	return top_border;
+	return top_border_Y;
 }
-short Screen::GetLeftBorder()
+short Screen::GetLeftBorderX()
 {
-	return left_border;
+	return left_border_X;
 }
-short Screen::GetBottomBorder()
+short Screen::GetBottomBorderY()
 {
-	return bottom_border;
+	return bottom_border_Y;
 }
-short Screen::GetRightBorder()
+short Screen::GetRightBorderX()
 {
-	return right_border;
+	return right_border_X;
 }
 
 SDL_Renderer* Screen::GetRenderer()

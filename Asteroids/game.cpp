@@ -11,13 +11,13 @@ Game::Game(Screen& _scr, Uint8 _latency) :
 	}
 
 	m_generator = mt19937(m_rd());
-	m_distribution_screen_width = uniform_int_distribution<short>(_scr.GetLeftBorder(), _scr.GetRightBorder());
-	m_distribution_screen_height = uniform_int_distribution<short>(_scr.GetTopBorder(), _scr.GetBottomBorder());
+	m_distribution_screen_width = uniform_int_distribution<short>(_scr.GetLeftBorderX(), _scr.GetRightBorderX());
+	m_distribution_screen_height = uniform_int_distribution<short>(_scr.GetTopBorderY(), _scr.GetBottomBorderY());
 
 	m_distribution_direction_x = uniform_int_distribution<short>(-5, 5);
 	m_distribution_direction_y = uniform_int_distribution<short>(-5, 5);
 
-	duration_game = 0;
+	duration = 0;
 
 	// initialization of the table of game control commands
 	cmd_table[0] = pair<int, Command>(27, CMD_EXIT);   // escape key
@@ -30,7 +30,7 @@ Game::Game(Screen& _scr, Uint8 _latency) :
 		big_asteroids[i] = new Sprite(screen.GetRenderer(), "../data/big_asteroid.png", COORD{ m_distribution_screen_width(m_generator), m_distribution_screen_height(m_generator) }, COORD{ m_distribution_direction_x(m_generator), m_distribution_direction_y(m_generator) }, 40, 40);
 	}
 
-	background = new Sprite(screen.GetRenderer(), "../data/background.png", COORD{ screen.GetLeftBorder(), screen.GetRightBorder() }, COORD{ 0, 0 }, screen.GetMapWidth(), screen.GetMapHeight());
+	background = new Sprite(screen.GetRenderer(), "../data/background.png", COORD{ screen.GetLeftBorderX(), screen.GetTopBorderY() }, COORD{ 0, 0 }, screen.GetMapWidth(), screen.GetMapHeight());
 
 	spaceship = new Sprite(screen.GetRenderer(), "../data/spaceship.png", COORD{ static_cast<short>(screen.GetWidth() / 2), static_cast<short>(screen.GetHeight() / 2) }, COORD{ 0, 0 }, 30, 30);
 }
@@ -180,8 +180,6 @@ bool Game::IsCollision(Sprite* first, Sprite* second)
 
 void Game::StartGameLoop(int mode_number) {
 
-	duration_game = 0;
-
 	//thread th(drawGameField);
 	drawGameField();           // draw the playing field
 	//th.join();
@@ -195,8 +193,8 @@ void Game::StartGameLoop(int mode_number) {
 
 	//printStatistics();                       // display the initial statistics of the game
 
-	clock_t time1, time2, duration;
-	time1 = clock();
+	clock_t start_time;
+	start_time = clock();
 	int mouse_x = 0, mouse_y = 0;
 	SDL_Event e;
 	bool MoveUp = false;
@@ -214,7 +212,7 @@ void Game::StartGameLoop(int mode_number) {
 	int StartTick = 0;
 
 	std::string str, s1, s2;
-	int /*SCREEN_WIDTH = 0, SCREEN_HEIGHT = 0, MAP_WIDTH = 0, MAP_HEIGHT = 0, */big_asteroids_count = 5, small_asteroids_count = 10;
+	int /*SCREEN_WIDTH = 0, SCREEN_HEIGHT = 0, MAP_WIDTH = 0, MAP_HEIGHT = 0, */big_asteroids_count = 5, small_asteroids_count = 0;
 
 	do {
 		SDL_GetMouseState(&mouse_x, &mouse_y);
@@ -321,17 +319,17 @@ void Game::StartGameLoop(int mode_number) {
 					speed_right -= 0.1;
 				}
 
-				if ((spaceship->GetX() + spaceship->GetOrginX()) < screen.GetLeftBorder()) {
-					spaceship->SetX(screen.GetRightBorder() - spaceship->GetOrginX());
+				if ((spaceship->GetX() + spaceship->GetOrginX()) < screen.GetLeftBorderX()) {
+					spaceship->SetX(screen.GetRightBorderX() - spaceship->GetOrginX());
 				}
-				else if ((spaceship->GetX() + spaceship->GetOrginX()) > screen.GetRightBorder()) {
-					spaceship->SetX(screen.GetLeftBorder() - spaceship->GetOrginX());
+				else if ((spaceship->GetX() + spaceship->GetOrginX()) > screen.GetRightBorderX()) {
+					spaceship->SetX(screen.GetLeftBorderX() - spaceship->GetOrginX());
 				}
-				else if ((spaceship->GetY() + spaceship->GetOrginY()) < screen.GetTopBorder()) {
-					spaceship->SetY(screen.GetBottomBorder() - spaceship->GetOrginY());
+				else if ((spaceship->GetY() + spaceship->GetOrginY()) < screen.GetTopBorderY()) {
+					spaceship->SetY(screen.GetBottomBorderY() - spaceship->GetOrginY());
 				}
-				else if (((spaceship->GetY() + spaceship->GetOrginY()) > screen.GetBottomBorder())) {
-					spaceship->SetY(screen.GetTopBorder() - spaceship->GetOrginY());
+				else if (((spaceship->GetY() + spaceship->GetOrginY()) > screen.GetBottomBorderY())) {
+					spaceship->SetY(screen.GetTopBorderY() - spaceship->GetOrginY());
 				}
 
 				timeCheck = (int)SDL_GetTicks();
@@ -430,6 +428,7 @@ void Game::StartGameLoop(int mode_number) {
 
 		SDL_RenderPresent(screen.GetRenderer());
 
+		duration = clock() - start_time;
 	} while (state == STATE_OK);          // play while the snake is alive
 
 	//screen.PrintString(screen.GetWidth() / 2 - 8, 10, " G a m e    o v e r ");
