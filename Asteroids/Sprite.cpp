@@ -5,10 +5,10 @@ Sprite::Sprite(SDL_Renderer* renderer, const char* path_to_image, COORD start_po
 	this->orgin.X = width / 2;
 	this->orgin.Y = height / 2;
 
-	this->final_counter = 0;
+	//this->final_counter = 0;
 
-	this->start_point.X = start_point.X;
-	this->start_point.Y = start_point.Y;
+	//this->start_point.X = start_point.X;
+	//this->start_point.Y = start_point.Y;
 
 	this->direction.X = direction.X;
 	this->direction.Y = direction.Y;
@@ -19,10 +19,10 @@ Sprite::Sprite(SDL_Renderer* renderer, const char* path_to_image, COORD start_po
 		std::cerr << IMG_GetError(); //Can be replaced by SDL_GetError()
 	}
 
-	this->location.x = start_point.X;
-	this->location.y = start_point.Y;
-	this->location.w = width;
-	this->location.h = height;
+	this->position.x = start_point.X;
+	this->position.y = start_point.Y;
+	this->position.w = width;
+	this->position.h = height;
 }
 
 Sprite::~Sprite()
@@ -31,33 +31,49 @@ Sprite::~Sprite()
 }
 
 void Sprite::Draw(SDL_Renderer* renderer) {
-	SDL_RenderCopy(renderer, image, NULL, &location);
+	SDL_RenderCopy(renderer, image, NULL, &position);
 }
 
-void Sprite::SetX(int X)
+//void Sprite::SetPositionXY(int X, int Y)
+//{
+//	this->position.x = X;
+//	this->position.y = Y;
+//}
+//
+//void Sprite::SetPositionX(int X)
+//{
+//	this->position.x = X;
+//}
+//
+//void Sprite::SetPositionY(int Y)
+//{
+//	this->position.y = Y;
+//}
+
+int Sprite::GetPositionX()
 {
-	this->location.x = X;
+	return this->position.x;
 }
 
-void Sprite::SetY(int Y)
+int Sprite::GetPositionY()
 {
-	this->location.y = Y;
-}
-
-int Sprite::GetX()
-{
-	return this->location.x;
-}
-
-int Sprite::GetY()
-{
-	return this->location.y;
+	return this->position.y;
 }
 
 void Sprite::SetDirection(COORD new_direction)
 {
 	this->direction.X = new_direction.X;
 	this->direction.Y = new_direction.Y;
+}
+
+void Sprite::SetDirectionX(short _X)
+{
+	this->direction.X = _X;
+}
+
+void Sprite::SetDirectionY(short _Y)
+{
+	this->direction.Y = _Y;
 }
 
 short Sprite::GetDirectionX()
@@ -72,28 +88,21 @@ short Sprite::GetDirectionY()
 
 void Sprite::Move(Screen& _scr)
 {
-	if ((this->location.x + this->GetOrginX()) < _scr.GetLeftBorderX()) {
-		this->location.x = _scr.GetRightBorderX() - this->GetOrginX();
+	if ((this->position.x + this->GetOrginX()) < _scr.GetLeftBorderX()) {
+		this->position.x = _scr.GetRightBorderX() - this->GetOrginX();
 	}
-	else if ((this->location.x + this->GetOrginX()) > _scr.GetRightBorderX()) {
-		this->location.x = _scr.GetLeftBorderX() - this->GetOrginX();
+	else if ((this->position.x + this->GetOrginX()) > _scr.GetRightBorderX()) {
+		this->position.x = _scr.GetLeftBorderX() - this->GetOrginX();
 	}
-	else if ((this->location.y + this->GetOrginY()) < _scr.GetTopBorderY()) {
-		this->location.y = _scr.GetBottomBorderY() - this->GetOrginY();
+	else if ((this->position.y + this->GetOrginY()) < _scr.GetTopBorderY()) {
+		this->position.y = _scr.GetBottomBorderY() - this->GetOrginY();
 	}
-	else if ((this->location.y + this->GetOrginY()) > _scr.GetBottomBorderY()) {
-		this->location.y = _scr.GetTopBorderY() - this->GetOrginY();
+	else if ((this->position.y + this->GetOrginY()) > _scr.GetBottomBorderY()) {
+		this->position.y = _scr.GetTopBorderY() - this->GetOrginY();
 	}
 	else {
-		if (this->location.w == 20) {
-			this->location.x = this->start_point.X + (this->direction.X - this->start_point.X) * final_counter;
-			this->location.y = this->start_point.Y + (this->direction.Y - this->start_point.Y) * final_counter;
-			this->final_counter += 0.02;
-		}
-		else {
-			this->location.x += this->direction.X;
-			this->location.y += this->direction.Y;
-		}
+		this->position.x += this->direction.X;
+		this->position.y += this->direction.Y;
 	}
 }
 

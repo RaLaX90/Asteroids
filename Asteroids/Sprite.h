@@ -16,13 +16,16 @@ public:
 
 	void Draw(SDL_Renderer* renderer);
 
-	void SetX(int X);
-	void SetY(int Y);
+	//void SetPositionXY(int X, int Y);
+	//void SetPositionX(int X);
+	//void SetPositionY(int Y);
 
-	int GetX();
-	int GetY();
+	int GetPositionX();
+	int GetPositionY();
 
 	void SetDirection(COORD new_direction);
+	void SetDirectionX(short _X);
+	void SetDirectionY(short _Y);
 	short GetDirectionX();
 	short GetDirectionY();
 
@@ -33,11 +36,14 @@ public:
 
 private:
 	SDL_Texture* image;
-	SDL_Rect location;
+	SDL_Rect position;
 
 	COORD orgin;
-	COORD start_point;
-	COORD direction;
+	//COORD start_point;
+	struct {
+		double X;
+		double Y;
+	} direction;
 
-	double final_counter;
+	//double final_counter;
 };

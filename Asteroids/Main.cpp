@@ -5,8 +5,8 @@
 //int temporary_X = 0, temporary_Y = 0;
 //
 //bool IsCollision(Sprite* first, Sprite* second) {
-//	if (((((first->GetX() + first->GetOrginX()) - (second->GetX() + second->GetOrginX())) * ((first->GetX() + first->GetOrginX()) - (second->GetX() + second->GetOrginX())))
-//		+ (((first->GetY() + first->GetOrginY()) - (second->GetY() + second->GetOrginY())) * ((first->GetY() + first->GetOrginY()) - (second->GetY() + second->GetOrginY())))) < 2 * 30 * 30) {
+//	if (((((first->GetPositionX() + first->GetOrginX()) - (second->GetPositionX() + second->GetOrginX())) * ((first->GetPositionX() + first->GetOrginX()) - (second->GetPositionX() + second->GetOrginX())))
+//		+ (((first->GetPositionY() + first->GetOrginY()) - (second->GetPositionY() + second->GetOrginY())) * ((first->GetPositionY() + first->GetOrginY()) - (second->GetPositionY() + second->GetOrginY())))) < 2 * 30 * 30) {
 //
 //		return true;
 //	}
@@ -125,7 +125,7 @@ int main(int argc, char* argv[]) {
 	//bool MoveDown = false;
 	//bool MoveLeft = false;
 	//bool MoveRight = false;
-	//int timeCheck = SDL_GetTicks();
+	//int timeCheck = SDL_GetTicks64();
 	//double speed_up = 0;
 	//double speed_left = 0;
 	//double speed_down = 0;
@@ -194,61 +194,61 @@ int main(int argc, char* argv[]) {
 	//		if (e.type == SDL_MOUSEBUTTONDOWN) {
 	//			if (e.button.button == SDL_BUTTON_LEFT) {
 	//				if (is_shot_allowed) {
-	//					bullet = new Sprite(renderer, "../data/bullet.png", spaceship->GetX() + 10, spaceship->GetY() + 10, mouse_x, mouse_y, 20, 20, border);
+	//					bullet = new Sprite(renderer, "../data/bullet.png", spaceship->GetPositionX() + 10, spaceship->GetPositionY() + 10, mouse_x, mouse_y, 20, 20, border);
 	//				}
 	//			}
 	//		}
 	//	}
 
 	//	if (spaceship != NULL) {
-	//		if (timeCheck + 10 < (int)SDL_GetTicks()) {
+	//		if (timeCheck + 10 < (int)SDL_GetTicks64()) {
 
 	//			if (MoveUp) {
-	//				spaceship->SetY(spaceship->GetY() - 4);
+	//				spaceship->SetPositionY(spaceship->GetPositionY() - 4);
 	//			}
 	//			else if (!MoveUp && (speed_up > 0)) {
-	//				spaceship->SetY(spaceship->GetY() - speed_up);
+	//				spaceship->SetPositionY(spaceship->GetPositionY() - speed_up);
 	//				speed_up -= 0.1;
 	//			}
 
 	//			if (MoveLeft) {
-	//				spaceship->SetX(spaceship->GetX() - 4);
+	//				spaceship->SetPositionX(spaceship->GetPositionX() - 4);
 	//			}
 	//			else if (!MoveLeft && speed_left > 0) {
-	//				spaceship->SetX(spaceship->GetX() - speed_left);
+	//				spaceship->SetPositionX(spaceship->GetPositionX() - speed_left);
 	//				speed_left -= 0.1;
 	//			}
 
 	//			if (MoveDown) {
-	//				spaceship->SetY(spaceship->GetY() + 4);
+	//				spaceship->SetPositionY(spaceship->GetPositionY() + 4);
 	//			}
 	//			else if (!MoveDown && speed_down > 0) {
-	//				spaceship->SetY(spaceship->GetY() + speed_down);
+	//				spaceship->SetPositionY(spaceship->GetPositionY() + speed_down);
 	//				speed_down -= 0.1;
 	//			}
 
 	//			if (MoveRight) {
-	//				spaceship->SetX(spaceship->GetX() + 4);
+	//				spaceship->SetPositionX(spaceship->GetPositionX() + 4);
 	//			}
 	//			else if (!MoveRight && speed_right > 0) {
-	//				spaceship->SetX(spaceship->GetX() + speed_right);
+	//				spaceship->SetPositionX(spaceship->GetPositionX() + speed_right);
 	//				speed_right -= 0.1;
 	//			}
 
-	//			if ((spaceship->GetX() + spaceship->GetOrginX()) < left_border_X) {
-	//				spaceship->SetX(right_border_X - spaceship->GetOrginX());
+	//			if ((spaceship->GetPositionX() + spaceship->GetOrginX()) < left_border_X) {
+	//				spaceship->SetPositionX(right_border_X - spaceship->GetOrginX());
 	//			}
-	//			else if ((spaceship->GetX() + spaceship->GetOrginX()) > (right_border_X)) {
-	//				spaceship->SetX(left_border_X - spaceship->GetOrginX());
+	//			else if ((spaceship->GetPositionX() + spaceship->GetOrginX()) > (right_border_X)) {
+	//				spaceship->SetPositionX(left_border_X - spaceship->GetOrginX());
 	//			}
-	//			else if ((spaceship->GetY() + spaceship->GetOrginY()) < top_border_Y) {
-	//				spaceship->SetY(bottom_border_Y - spaceship->GetOrginY());
+	//			else if ((spaceship->GetPositionY() + spaceship->GetOrginY()) < top_border_Y) {
+	//				spaceship->SetPositionY(bottom_border_Y - spaceship->GetOrginY());
 	//			}
-	//			else if (((spaceship->GetY() + spaceship->GetOrginY()) > bottom_border_Y)) {
-	//				spaceship->SetY(top_border_Y - spaceship->GetOrginY());
+	//			else if (((spaceship->GetPositionY() + spaceship->GetOrginY()) > bottom_border_Y)) {
+	//				spaceship->SetPositionY(top_border_Y - spaceship->GetOrginY());
 	//			}
 
-	//			timeCheck = (int)SDL_GetTicks();
+	//			timeCheck = (int)SDL_GetTicks64();
 	//		}
 	//	}
 
@@ -258,7 +258,7 @@ int main(int argc, char* argv[]) {
 	//	background->Draw();
 
 	//	if (spaceship == NULL) {
-	//		if ((SDL_GetTicks() - StartTick) >= 1000) {
+	//		if ((SDL_GetTicks64() - StartTick) >= 1000) {
 	//			spaceship = new Sprite(renderer, "../data/spaceship.png", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0, 0, 30, 30, border);
 	//			is_shot_allowed = true;
 	//		}
@@ -280,7 +280,7 @@ int main(int argc, char* argv[]) {
 	//					//spaceship vs big
 	//					if (IsCollision(spaceship, big_asteroids[i])) {
 	//						destruction(spaceship, big_asteroids[i]);
-	//						StartTick = SDL_GetTicks();
+	//						StartTick = SDL_GetTicks64();
 	//						is_shot_allowed = false;
 	//						break;
 	//					}
@@ -299,9 +299,9 @@ int main(int argc, char* argv[]) {
 	//					//bullet vs big
 	//					if (bullet != NULL) {
 	//						if (IsCollision(bullet, big_asteroids[i])) {
-	//							small_asteroids[small_asteroids_count] = new Sprite(renderer, "../data/small_asteroid.png", big_asteroids[i]->GetX() + 15, big_asteroids[i]->GetY() + 50, big_asteroids[i]->GetDirectionX() / 2, big_asteroids[i]->GetDirectionY() * 2, 30, 30, border);
+	//							small_asteroids[small_asteroids_count] = new Sprite(renderer, "../data/small_asteroid.png", big_asteroids[i]->GetPositionX() + 15, big_asteroids[i]->GetPositionY() + 50, big_asteroids[i]->GetDirectionX() / 2, big_asteroids[i]->GetDirectionY() * 2, 30, 30, border);
 	//							small_asteroids_count++;
-	//							small_asteroids[small_asteroids_count] = new Sprite(renderer, "../data/small_asteroid.png", big_asteroids[i]->GetX() + 50, big_asteroids[i]->GetY() + 15, big_asteroids[i]->GetDirectionX() * 2, big_asteroids[i]->GetDirectionY() / 2, 30, 30, border);
+	//							small_asteroids[small_asteroids_count] = new Sprite(renderer, "../data/small_asteroid.png", big_asteroids[i]->GetPositionX() + 50, big_asteroids[i]->GetPositionY() + 15, big_asteroids[i]->GetDirectionX() * 2, big_asteroids[i]->GetDirectionY() / 2, 30, 30, border);
 	//							small_asteroids_count++;
 
 	//							destruction(bullet, big_asteroids[i]);

@@ -168,8 +168,8 @@ void Game::destruction(Sprite*& first, Sprite*& second)
 
 bool Game::IsCollision(Sprite* first, Sprite* second)
 {
-	if (((((first->GetX() + first->GetOrginX()) - (second->GetX() + second->GetOrginX())) * ((first->GetX() + first->GetOrginX()) - (second->GetX() + second->GetOrginX())))
-		+ (((first->GetY() + first->GetOrginY()) - (second->GetY() + second->GetOrginY())) * ((first->GetY() + first->GetOrginY()) - (second->GetY() + second->GetOrginY())))) < 2 * 30 * 30) {
+	if (((((first->GetPositionX() + first->GetOrginX()) - (second->GetPositionX() + second->GetOrginX())) * ((first->GetPositionX() + first->GetOrginX()) - (second->GetPositionX() + second->GetOrginX())))
+		+ (((first->GetPositionY() + first->GetOrginY()) - (second->GetPositionY() + second->GetOrginY())) * ((first->GetPositionY() + first->GetOrginY()) - (second->GetPositionY() + second->GetOrginY())))) < 2 * 30 * 30) {
 
 		return true;
 	}
@@ -180,14 +180,14 @@ bool Game::IsCollision(Sprite* first, Sprite* second)
 
 void Game::StartGameLoop(int mode_number) {
 
-	//thread th(drawGameField);
-	drawGameField();           // draw the playing field
-	//th.join();
+	thread th([&] { drawGameField(); });
+	//drawGameField();           // draw the playing field
+	th.detach();
 
 	Command cmd = CMD_NOCOMMAND;
 	State state = STATE_OK;
-	// delta contains the coordinate increment (dx, dy) for each snake move across the field
-	COORD delta{ -1, 0 };                // initial movement - to the left
+	// direction contains the coordinate increment (dx, dy) for each snake move across the field
+	COORD direction{ 0, 0 };                // initial movement - to the left
 	//COORD food = createFood();          // calculate food coordinates
 	//screen.PrintString(food.X, food.Y, food_symbol);      // display food on the screen
 
@@ -202,7 +202,7 @@ void Game::StartGameLoop(int mode_number) {
 	bool MoveLeft = false;
 	bool MoveRight = false;
 
-	int timeCheck = SDL_GetTicks();
+	int currentTime = SDL_GetTicks64();
 	double speed_up = 0;
 	double speed_left = 0;
 	double speed_down = 0;
@@ -212,128 +212,104 @@ void Game::StartGameLoop(int mode_number) {
 	int StartTick = 0;
 
 	std::string str, s1, s2;
-	int /*SCREEN_WIDTH = 0, SCREEN_HEIGHT = 0, MAP_WIDTH = 0, MAP_HEIGHT = 0, */big_asteroids_count = 5, small_asteroids_count = 0;
+	int big_asteroids_count = 5, small_asteroids_count = 0;
 
 	do {
-		SDL_GetMouseState(&mouse_x, &mouse_y);
-		// Event handling
-		while (SDL_PollEvent(&e)) {
-
-			if (e.type == SDL_KEYDOWN) {
-				switch (e.key.keysym.sym) {
-				case SDLK_ESCAPE: {
-					state = STATE_EXIT;
-					break;
-				}
-				case SDLK_w: {
-					MoveUp = true;
-					break;
-				}
-				case SDLK_a: {
-					MoveLeft = true;
-					break;
-				}
-				case SDLK_s: {
-					MoveDown = true;
-					break;
-				}
-				case SDLK_d: {
-					MoveRight = true;
-					break;
-				}
-				default: {
-					break;
-				}
-				}
-			}
-
-			if (e.type == SDL_KEYUP) {
-				switch (e.key.keysym.sym) {
-				case SDLK_w: {
-					MoveUp = false;
-					speed_up = 4;
-					break;
-				}
-				case SDLK_a: {
-					MoveLeft = false;
-					speed_left = 4;
-					break;
-				}
-				case SDLK_s: {
-					MoveDown = false;
-					speed_down = 4;
-					break;
-				}
-				case SDLK_d: {
-					MoveRight = false;
-					speed_right = 4;
-					break;
-				}
-				default: {
-					break;
-				}
-				}
-			}
-
-			if (e.type == SDL_MOUSEBUTTONDOWN) {
-				if (e.button.button == SDL_BUTTON_LEFT) {
-					if (is_shot_allowed) {
-						bullet = new Sprite(screen.GetRenderer(), "../data/bullet.png", COORD{ static_cast<short>(spaceship->GetX() + 10), static_cast<short>(spaceship->GetY() + 10) }, COORD{ static_cast<short>(mouse_x), static_cast<short>(mouse_y) }, 20, 20);
-					}
-				}
-			}
-		}
 
 		if (spaceship != nullptr) {
-			if (timeCheck + 10 < (int)SDL_GetTicks()) {
+			// Event handling
+			while (SDL_PollEvent(&e)) {
 
-				if (MoveUp) {
-					spaceship->SetY(spaceship->GetY() - 4);
-				}
-				else if (!MoveUp && (speed_up > 0)) {
-					spaceship->SetY(spaceship->GetY() - speed_up);
-					speed_up -= 0.1;
+				if (currentTime + 10 < (int)SDL_GetTicks64()) {
+					if (e.type == SDL_KEYDOWN) {
+						switch (e.key.keysym.sym) {
+						case SDLK_ESCAPE: {
+							state = STATE_EXIT;
+							break;
+						}
+						case SDLK_w: {
+							MoveUp = true;
+							spaceship->SetDirectionY(spaceship->GetDirectionY() - 1);
+							break;
+						}
+						case SDLK_a: {
+							MoveLeft = true;
+							spaceship->SetDirectionX(spaceship->GetDirectionX() - 1);
+							break;
+						}
+						case SDLK_s: {
+							MoveDown = true;
+							spaceship->SetDirectionY(spaceship->GetDirectionY() + 1);
+							break;
+						}
+						case SDLK_d: {
+							MoveRight = true;
+							spaceship->SetDirectionX(spaceship->GetDirectionX() + 1);
+							break;
+						}
+						default: {
+							break;
+						}
+						}
+					}
+
+					if (e.type == SDL_KEYUP) {
+						switch (e.key.keysym.sym) {
+						case SDLK_w: {
+							MoveUp = false;
+							break;
+						}
+						case SDLK_a: {
+							MoveLeft = false;
+							break;
+						}
+						case SDLK_s: {
+							MoveDown = false;
+							break;
+						}
+						case SDLK_d: {
+							MoveRight = false;
+							break;
+						}
+						default: {
+							break;
+						}
+						}
+					}
+
+					if (e.type == SDL_MOUSEBUTTONDOWN) {
+						if (e.button.button == SDL_BUTTON_LEFT) {
+							if (is_shot_allowed) {
+								SDL_GetMouseState(&mouse_x, &mouse_y);
+								bullet = new Sprite(screen.GetRenderer(), "../data/bullet.png", COORD{ static_cast<short>(spaceship->GetPositionX() + 10), static_cast<short>(spaceship->GetPositionY() + 10) }, COORD{ static_cast<short>(mouse_x), static_cast<short>(mouse_y) }, 20, 20);
+							}
+						}
+					}
 				}
 
-				if (MoveLeft) {
-					spaceship->SetX(spaceship->GetX() - 4);
+				//if (currentTime + 10 < (int)SDL_GetTicks64()) {
+
+				if (!MoveUp && (spaceship->GetDirectionY() < 0)) {
+					spaceship->SetDirectionY(spaceship->GetDirectionY() + 0.1);
 				}
-				else if (!MoveLeft && speed_left > 0) {
-					spaceship->SetX(spaceship->GetX() - speed_left);
-					speed_left -= 0.1;
+				if (!MoveLeft && (spaceship->GetDirectionX() < 0)) {
+					spaceship->SetDirectionX(spaceship->GetDirectionX() + 0.1);
+				}
+				if (!MoveDown && (spaceship->GetDirectionY() > 0)) {
+					spaceship->SetDirectionY(spaceship->GetDirectionY() - 0.1);
+				}
+				if (!MoveRight && (spaceship->GetDirectionX() > 0)) {
+					spaceship->SetDirectionX(spaceship->GetDirectionX() - 0.1);
 				}
 
-				if (MoveDown) {
-					spaceship->SetY(spaceship->GetY() + 4);
-				}
-				else if (!MoveDown && speed_down > 0) {
-					spaceship->SetY(spaceship->GetY() + speed_down);
-					speed_down -= 0.1;
-				}
-
-				if (MoveRight) {
-					spaceship->SetX(spaceship->GetX() + 4);
-				}
-				else if (!MoveRight && speed_right > 0) {
-					spaceship->SetX(spaceship->GetX() + speed_right);
-					speed_right -= 0.1;
-				}
-
-				if ((spaceship->GetX() + spaceship->GetOrginX()) < screen.GetLeftBorderX()) {
-					spaceship->SetX(screen.GetRightBorderX() - spaceship->GetOrginX());
-				}
-				else if ((spaceship->GetX() + spaceship->GetOrginX()) > screen.GetRightBorderX()) {
-					spaceship->SetX(screen.GetLeftBorderX() - spaceship->GetOrginX());
-				}
-				else if ((spaceship->GetY() + spaceship->GetOrginY()) < screen.GetTopBorderY()) {
-					spaceship->SetY(screen.GetBottomBorderY() - spaceship->GetOrginY());
-				}
-				else if (((spaceship->GetY() + spaceship->GetOrginY()) > screen.GetBottomBorderY())) {
-					spaceship->SetY(screen.GetTopBorderY() - spaceship->GetOrginY());
-				}
-
-				timeCheck = (int)SDL_GetTicks();
+				currentTime = (int)SDL_GetTicks64();
 			}
+		}
+		else if (spaceship == nullptr) {
+			//if ((SDL_GetTicks64() - StartTick) >= 1000) {
+			spaceship = new Sprite(screen.GetRenderer(), "../data/spaceship.png", COORD{ static_cast<short>(screen.GetWidth() / 2), static_cast<short>(screen.GetHeight() / 2) }, COORD{ 0, 0 }, 30, 30);
+			is_shot_allowed = true;
+			//}
 		}
 
 		// Scene showing
@@ -341,89 +317,82 @@ void Game::StartGameLoop(int mode_number) {
 
 		background->Draw(screen.GetRenderer());
 
-		if (spaceship == nullptr) {
-			if ((SDL_GetTicks() - StartTick) >= 1000) {
-				spaceship = new Sprite(screen.GetRenderer(), "../data/spaceship.png", COORD{ static_cast<short>(screen.GetWidth() / 2), static_cast<short>(screen.GetHeight() / 2) }, COORD{ 0, 0 }, 30, 30);
-				is_shot_allowed = true;
+		for (int i = 0; i < big_asteroids_count * 2; i++) {
+			if (i < big_asteroids_count) {
+				if (big_asteroids[i] != nullptr) {
+					big_asteroids[i]->Move(screen);
+
+					//spaceship vs big
+					if (IsCollision(spaceship, big_asteroids[i])) {
+						destruction(spaceship, big_asteroids[i]);
+						is_shot_allowed = false;
+						break;
+					}
+
+					//big vs big
+					for (int j = i + 1; j < big_asteroids_count - 1; j++) {
+						if (big_asteroids[j] != nullptr) {
+							if (IsCollision(big_asteroids[i], big_asteroids[j])) {
+								swap_directions(big_asteroids[i], big_asteroids[j]);
+							}
+						}
+					}
+
+					//bullet vs big
+					if (bullet != nullptr) {
+						if (IsCollision(bullet, big_asteroids[i])) {
+							small_asteroids[small_asteroids_count] = new Sprite(screen.GetRenderer(), "../data/small_asteroid.png", COORD{ static_cast<short>(big_asteroids[i]->GetPositionX() + 15), static_cast<short>(big_asteroids[i]->GetPositionY() + 50) }, COORD{ static_cast<short>(big_asteroids[i]->GetDirectionX() / 2), static_cast<short>(big_asteroids[i]->GetDirectionY() * 2) }, 30, 30);
+							small_asteroids_count++;
+							small_asteroids[small_asteroids_count] = new Sprite(screen.GetRenderer(), "../data/small_asteroid.png", COORD{ static_cast<short>(big_asteroids[i]->GetPositionX() + 50), static_cast<short>(big_asteroids[i]->GetPositionY() + 15) }, COORD{ static_cast<short>(big_asteroids[i]->GetDirectionX() * 2), static_cast<short>(big_asteroids[i]->GetDirectionY() / 2) }, 30, 30);
+							small_asteroids_count++;
+
+							destruction(bullet, big_asteroids[i]);
+							break;
+						}
+					}
+
+					big_asteroids[i]->Draw(screen.GetRenderer());
+				}
+			}
+
+			if (small_asteroids[i] != nullptr) {
+				small_asteroids[i]->Move(screen);
+
+				for (int j = 0; j < big_asteroids_count; j++) {
+					if (big_asteroids[j] != nullptr) {
+						if (IsCollision(small_asteroids[i], big_asteroids[j])) {
+							swap_directions(small_asteroids[i], big_asteroids[j]);
+						}
+					}
+				}
+
+				for (int j = 0; j < big_asteroids_count * 2; j++) {
+					if (small_asteroids[j] != nullptr && i != j) {
+						if (IsCollision(small_asteroids[i], small_asteroids[j])) {
+							swap_directions(small_asteroids[i], small_asteroids[j]);
+						}
+					}
+				}
+
+				if (bullet != nullptr) {
+					if (IsCollision(bullet, small_asteroids[i])) {
+						destruction(bullet, small_asteroids[i]);
+						break;
+					}
+				}
+
+				small_asteroids[i]->Draw(screen.GetRenderer());
 			}
 		}
-		else {
 
+		if (spaceship != nullptr) {
+			spaceship->Move(screen);
 			spaceship->Draw(screen.GetRenderer());
+		}
 
-			if (bullet != nullptr) {
-				bullet->Move(screen);
-				bullet->Draw(screen.GetRenderer());
-			}
-
-			for (int i = 0; i < big_asteroids_count * 2; i++) {
-				if (i < big_asteroids_count) {
-					if (big_asteroids[i] != nullptr) {
-						big_asteroids[i]->Move(screen);
-
-						//spaceship vs big
-						if (IsCollision(spaceship, big_asteroids[i])) {
-							destruction(spaceship, big_asteroids[i]);
-							StartTick = SDL_GetTicks();
-							is_shot_allowed = false;
-							break;
-						}
-
-						//big vs big
-						for (int j = i + 1; j < big_asteroids_count - 1; j++) {
-							if (big_asteroids[j] != nullptr) {
-								if (IsCollision(big_asteroids[i], big_asteroids[j])) {
-									swap_directions(big_asteroids[i], big_asteroids[j]);
-								}
-							}
-						}
-
-						big_asteroids[i]->Draw(screen.GetRenderer());
-
-						//bullet vs big
-						if (bullet != nullptr) {
-							if (IsCollision(bullet, big_asteroids[i])) {
-								small_asteroids[small_asteroids_count] = new Sprite(screen.GetRenderer(), "../data/small_asteroid.png", COORD{ static_cast<short>(big_asteroids[i]->GetX() + 15), static_cast<short>(big_asteroids[i]->GetY() + 50) }, COORD{ static_cast<short>(big_asteroids[i]->GetDirectionX() / 2), static_cast<short>(big_asteroids[i]->GetDirectionY() * 2) }, 30, 30);
-								small_asteroids_count++;
-								small_asteroids[small_asteroids_count] = new Sprite(screen.GetRenderer(), "../data/small_asteroid.png", COORD{ static_cast<short>(big_asteroids[i]->GetX() + 50), static_cast<short>(big_asteroids[i]->GetY() + 15) }, COORD{ static_cast<short>(big_asteroids[i]->GetDirectionX() * 2), static_cast<short>(big_asteroids[i]->GetDirectionY() / 2) }, 30, 30);
-								small_asteroids_count++;
-
-								destruction(bullet, big_asteroids[i]);
-								break;
-							}
-						}
-					}
-				}
-
-				if (small_asteroids[i] != nullptr) {
-					small_asteroids[i]->Move(screen);
-
-					for (int j = 0; j < big_asteroids_count; j++) {
-						if (big_asteroids[j] != nullptr) {
-							if (IsCollision(small_asteroids[i], big_asteroids[j])) {
-								swap_directions(small_asteroids[i], big_asteroids[j]);
-							}
-						}
-					}
-
-					for (int j = 0; j < big_asteroids_count * 2; j++) {
-						if (small_asteroids[j] != nullptr && i != j) {
-							if (IsCollision(small_asteroids[i], small_asteroids[j])) {
-								swap_directions(small_asteroids[i], small_asteroids[j]);
-							}
-						}
-					}
-
-					small_asteroids[i]->Draw(screen.GetRenderer());
-
-					if (bullet != nullptr) {
-						if (IsCollision(bullet, small_asteroids[i])) {
-							destruction(bullet, small_asteroids[i]);
-							break;
-						}
-					}
-				}
-			}
+		if (bullet != nullptr) {
+			bullet->Move(screen);
+			bullet->Draw(screen.GetRenderer());
 		}
 
 		SDL_RenderPresent(screen.GetRenderer());
