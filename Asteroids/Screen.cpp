@@ -1,126 +1,66 @@
 #include "Screen.h"
 
-// _width - playing field width (x)
-// _height - height of the playing field (y)
-Screen::Screen(short _width, short _height, short _map_width, short _map_height) {
+// _width - playing field m_screen_width (x)
+// _height - m_screen_height of the playing field (y)
+Screen::Screen(short _width, short _height, short _map_width, short _map_height):
+	m_screen_width(_width), m_screen_height(_height), m_map_width(_map_width), m_map_height(_map_height) {
 
-	//if width and height = 0 then set him to default teminal size
-	if (_width == 0 && _height == 0) {
-		CONSOLE_SCREEN_BUFFER_INFO pcsbi;
-		GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &pcsbi);
+	m_top_border_Y = (m_screen_height / 2) - (m_map_height / 2);
+	m_left_border_X = (m_screen_width / 2) - (m_map_width / 2);
+	m_bottom_border_Y = (m_screen_height / 2) + (m_map_height / 2);
+	m_right_border_X = (m_screen_width / 2) + (m_map_width / 2);
 
-		width = pcsbi.dwMaximumWindowSize.X;
-		height = pcsbi.dwMaximumWindowSize.Y / 2 - 2;
-	}
-	else {
-		width = _width;
-		height = _height;
-	}
-
-	win = SDL_CreateWindow("Asteroids_windows", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, _width, _height, SDL_WINDOW_RESIZABLE);
+	win = SDL_CreateWindow("Asteroids_windows", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, m_screen_width, m_screen_height, SDL_WINDOW_RESIZABLE);
 	if (win == nullptr) {
-		std::cout << "SDL_CreateWindow Error: " << SDL_GetError() << std::endl;
+		std::cerr << "SDL_CreateWindow Error: " << SDL_GetError() << std::endl;
 	}
 
 	renderer = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 	if (renderer == nullptr) {
-		std::cout << "SDL_CreateRenderer Error: " << SDL_GetError() << std::endl;
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error at renderer create", SDL_GetError(), NULL);
+		throw "Error at renderer create";
 	}
-
-	top_border_Y = (_height / 2) - (_map_height / 2);
-	left_border_X = (_width / 2) - (_map_width / 2);
-	bottom_border_Y = (_height / 2) + (_map_height / 2);
-	right_border_X = (_width / 2) + (_map_width / 2);
-
-	map_width = _map_width;
-	map_height = _map_height;
-
-	m_console_handle = GetStdHandle(STD_OUTPUT_HANDLE);
-	if (m_console_handle == INVALID_HANDLE_VALUE) {
-		throw "Failed GetStdHandle(): INVALID_HANDLE_VALUE";
-	}
-
-	//if (!GetConsoleCursorInfo(m_console_handle, &m_old_cursor_info)) {
-	//	throw "Failed GetConsoleCursorInfo()";
-	//}
-
-	//m_current_cursor_info.dwSize = m_old_cursor_info.dwSize;
-	//m_current_cursor_info.bVisible = m_old_cursor_info.bVisible;
-
-	//CONSOLE_SCREEN_BUFFER_INFO csbi;
-	//GetConsoleScreenBufferInfo(m_console_handle, &csbi);
-	//m_old_text_attribute = csbi.wAttributes;
 }
 
 Screen::~Screen() {
-	//SetConsoleCursorInfo(m_console_handle, &m_old_cursor_info);
-	//SetConsoleTextAttribute(m_console_handle, m_old_text_attribute);
-
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(win);
 }
 
-//void Screen::SetCursorShow(bool visible) {
-//	m_current_cursor_info.bVisible = visible;
-//	if (!SetConsoleCursorInfo(m_console_handle, &m_current_cursor_info)) {
-//		throw "Failed SetConsoleCursorInfo()";
-//	}
-//}
-
-void Screen::SetTextAttribute(WORD attr) {
-	SetConsoleTextAttribute(m_console_handle, attr);
-}
-
-void Screen::SetCursorPosition(short position_x, short position_y)
+short Screen::GetScreenWidth()
 {
-	COORD pos = { position_x, position_y };
-	SetConsoleCursorPosition(m_console_handle, pos);
+	return m_screen_width;
 }
 
-void Screen::PrintString(short position_x, short position_y, string text)
+short Screen::GetScreenHeight()
 {
-	SetCursorPosition(position_x, position_y);
-	cout << text;
-}
-
-void Screen::ClearScreen() {
-	system("cls");
-}
-
-short Screen::GetWidth()
-{
-	return width;
-}
-
-short Screen::GetHeight()
-{
-	return height;
+	return m_screen_height;
 }
 
 short Screen::GetMapWidth()
 {
-	return map_width;
+	return m_map_width;
 }
 
 short Screen::GetMapHeight()
 {
-	return map_height;
+	return m_map_height;
 }
 short Screen::GetTopBorderY()
 {
-	return top_border_Y;
+	return m_top_border_Y;
 }
 short Screen::GetLeftBorderX()
 {
-	return left_border_X;
+	return m_left_border_X;
 }
 short Screen::GetBottomBorderY()
 {
-	return bottom_border_Y;
+	return m_bottom_border_Y;
 }
 short Screen::GetRightBorderX()
 {
-	return right_border_X;
+	return m_right_border_X;
 }
 
 SDL_Renderer* Screen::GetRenderer()
