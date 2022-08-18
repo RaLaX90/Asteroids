@@ -2,7 +2,7 @@
 
 // _width - playing field m_screen_width (x)
 // _height - m_screen_height of the playing field (y)
-Screen::Screen(short _width, short _height, short _map_width, short _map_height):
+Screen::Screen(short _width, short _height, short _map_width, short _map_height) :
 	m_screen_width(_width), m_screen_height(_height), m_map_width(_map_width), m_map_height(_map_height) {
 
 	m_top_border_Y = (m_screen_height / 2) - (m_map_height / 2);
@@ -10,21 +10,20 @@ Screen::Screen(short _width, short _height, short _map_width, short _map_height)
 	m_bottom_border_Y = (m_screen_height / 2) + (m_map_height / 2);
 	m_right_border_X = (m_screen_width / 2) + (m_map_width / 2);
 
-	win = SDL_CreateWindow("Asteroids_windows", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, m_screen_width, m_screen_height, SDL_WINDOW_RESIZABLE);
-	if (win == nullptr) {
-		std::cerr << "SDL_CreateWindow Error: " << SDL_GetError() << std::endl;
+	m_window = SDL_CreateWindow("Asteroids_windows", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, m_screen_width, m_screen_height, SDL_WINDOW_RESIZABLE);
+	if (m_window == nullptr) {
+		throw "Error at window create";
 	}
 
-	renderer = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-	if (renderer == nullptr) {
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error at renderer create", SDL_GetError(), NULL);
+	m_renderer = SDL_CreateRenderer(m_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+	if (m_renderer == nullptr) {
 		throw "Error at renderer create";
 	}
 }
 
 Screen::~Screen() {
-	SDL_DestroyRenderer(renderer);
-	SDL_DestroyWindow(win);
+	SDL_DestroyRenderer(m_renderer);
+	SDL_DestroyWindow(m_window);
 }
 
 short Screen::GetScreenWidth()
@@ -65,5 +64,5 @@ short Screen::GetRightBorderX()
 
 SDL_Renderer* Screen::GetRenderer()
 {
-	return renderer;
+	return m_renderer;
 }

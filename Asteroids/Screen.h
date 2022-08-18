@@ -27,6 +27,6 @@ private:
 	short m_screen_width = 0, m_screen_height = 0, m_map_width = 0, m_map_height = 0;		// playing field m_screen_width and m_screen_height
 	short m_top_border_Y = 0, m_left_border_X = 0, m_bottom_border_Y = 0, m_right_border_X = 0;		// playing field m_screen_width and m_screen_height
 
-	SDL_Window* win = nullptr;
-	SDL_Renderer* renderer = nullptr;
+	SDL_Window* m_window = nullptr;
+	SDL_Renderer* m_renderer = nullptr;
 };

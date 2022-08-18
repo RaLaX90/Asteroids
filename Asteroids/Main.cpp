@@ -6,19 +6,17 @@ int main(int argc, char* argv[]) {
 
 	try
 	{
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error at renderer create", SDL_GetError(), NULL);
-
 		Screen m_screen{ 1920, 1080, 1920, 1080 };
-		Game game{ &m_screen, 120 };
+		Game game{ &m_screen, 5, 120 };
 
 		//do {
-			game.StartGameLoop();
+		game.StartGameLoop();
 
 		//} while (game.IsOnceMore());
 	}
 	catch (const std::exception& Ex)
 	{
-		cerr << "*** " << Ex.what() << endl;
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", Ex.what(), NULL);
 	}
 
 	return 0;

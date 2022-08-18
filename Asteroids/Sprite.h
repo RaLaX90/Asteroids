@@ -1,30 +1,34 @@
 #pragma once
 
-typedef struct directionStruct {
-	int X;
-	int Y;
-};
-
 #include "Screen.h"
+#include <SDL.h>
+#include "SDL_image.h"
+#include <windows.h>
+
+struct directionStruct {
+	short X;
+	short Y;
+};
 
 class Sprite
 {
 public:
-	Sprite(SDL_Renderer* _renderer, const char* _path_to_image, COORD _start_point, directionStruct _direction, int _screen_width, int _screen_height);
+	Sprite(SDL_Renderer* _renderer, const char* _path_to_image, COORD _start_point, directionStruct _direction, Uint16 _screen_width, Uint16 _screen_height);
 	~Sprite();
 
-	void Draw(SDL_Renderer* renderer);
+	void Draw(SDL_Renderer* m_renderer);
 
-	void SetPositionXY(int X, int Y);
-	void SetPositionX(int X);
-	void SetPositionY(int Y);
+	void SetPositionXY(int _X, int _Y);
+	void SetPositionX(int _X);
+	void SetPositionY(int _Y);
 
 	int GetPositionX();
 	int GetPositionY();
 
-	void SetDirection(int new_direction_X, int new_direction_Y);
+	void SetDirectionXY(int _X, int _Y);
 	void SetDirectionX(int _X);
 	void SetDirectionY(int _Y);
+
 	int GetDirectionX();
 	int GetDirectionY();
 
@@ -42,8 +46,5 @@ private:
 		int Y;
 	} orgin;
 
-	struct directionStruct {
-		int X;
-		int Y;
-	} direction;
+	directionStruct direction;
 };

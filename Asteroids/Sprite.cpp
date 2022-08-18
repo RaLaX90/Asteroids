@@ -1,9 +1,9 @@
 #include "Sprite.h"
 
-Sprite::Sprite(SDL_Renderer* _renderer, const char* _path_to_image, COORD _start_point, directionStruct _direction, int _screen_width, int _screen_height)
+Sprite::Sprite(SDL_Renderer* _renderer, const char* _path_to_image, COORD _position, directionStruct _direction, Uint16 _screen_width, Uint16 _screen_height)
 {
-	this->position.x = _start_point.X;
-	this->position.y = _start_point.Y;
+	this->position.x = _position.X;
+	this->position.y = _position.Y;
 	this->position.w = _screen_width;
 	this->position.h = _screen_height;
 
@@ -16,7 +16,7 @@ Sprite::Sprite(SDL_Renderer* _renderer, const char* _path_to_image, COORD _start
 	this->image = IMG_LoadTexture(_renderer, _path_to_image);
 	if (!image)
 	{
-		std::cerr << SDL_GetError();
+		throw "Error at load image";
 	}
 }
 
@@ -25,8 +25,8 @@ Sprite::~Sprite()
 	SDL_DestroyTexture(image);
 }
 
-void Sprite::Draw(SDL_Renderer* renderer) {
-	SDL_RenderCopy(renderer, image, NULL, &position);
+void Sprite::Draw(SDL_Renderer* m_renderer) {
+	SDL_RenderCopy(m_renderer, image, NULL, &position);
 }
 
 void Sprite::SetPositionXY(int X, int Y)
@@ -55,7 +55,7 @@ int Sprite::GetPositionY()
 	return this->position.y;
 }
 
-void Sprite::SetDirection(int new_direction_X, int new_direction_Y)
+void Sprite::SetDirectionXY(int new_direction_X, int new_direction_Y)
 {
 	this->direction.X = new_direction_X;
 	this->direction.Y = new_direction_Y;

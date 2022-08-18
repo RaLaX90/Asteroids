@@ -3,11 +3,11 @@
 // Constructor
 // _scr - an object that outputs to the console
 // _latency - delay between position changes in milliseconds
-Game::Game(Screen* _scr, Uint8 _latency) :
-	m_screen(*_scr)/*, m_latency(_latency)*/ {
+Game::Game(Screen* _scr, Uint8 _big_asteroids_count, Uint8 _latency) :
+	m_screen(*_scr), m_big_asteroids_count(_big_asteroids_count)/*, m_latency(_latency)*/ {
 
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
-		std::cerr << "SDL_Init Error: " << SDL_GetError() << std::endl;
+		throw "Error at sdl_init";
 	}
 
 	m_generator = mt19937(m_rd());
@@ -19,13 +19,13 @@ Game::Game(Screen* _scr, Uint8 _latency) :
 
 	m_duration = 0;
 
-	for (int i = 0; i < m_big_asteroids_count; i++) {
-		big_asteroids[i] = new Sprite(m_screen.GetRenderer(), "../data/big_asteroid.png", COORD{ m_distribution_screen_width(m_generator), m_distribution_screen_height(m_generator) }, COORD{ m_distribution_direction_x(m_generator), m_distribution_direction_y(m_generator) }, 40, 40);
+	for (Uint8 i = 0; i < m_big_asteroids_count; i++) {
+		big_asteroids[i] = new Sprite(m_screen.GetRenderer(), "../data/big_asteroid.png", COORD{ m_distribution_screen_width(m_generator), m_distribution_screen_height(m_generator) }, directionStruct{ m_distribution_direction_x(m_generator), m_distribution_direction_y(m_generator) }, 40, 40);
 	}
 
-	background = new Sprite(m_screen.GetRenderer(), "../data/background.png", COORD{ m_screen.GetLeftBorderX(), m_screen.GetTopBorderY() }, COORD{ 0, 0 }, m_screen.GetMapWidth(), m_screen.GetMapHeight());
+	background = new Sprite(m_screen.GetRenderer(), "../data/background.png", COORD{ m_screen.GetLeftBorderX(), m_screen.GetTopBorderY() }, directionStruct{ 0, 0 }, m_screen.GetMapWidth(), m_screen.GetMapHeight());
 
-	spaceship = new Sprite(m_screen.GetRenderer(), "../data/spaceship.png", COORD{ static_cast<short>(m_screen.GetScreenWidth() / 2), static_cast<short>(m_screen.GetScreenHeight() / 2) }, COORD{ 0, 0 }, 30, 30);
+	spaceship = new Sprite(m_screen.GetRenderer(), "../data/spaceship.png", COORD{ static_cast<short>(m_screen.GetScreenWidth() / 2), static_cast<short>(m_screen.GetScreenHeight() / 2) }, directionStruct{ 0, 0 }, 30, 30);
 }
 
 Game::~Game()
@@ -35,7 +35,7 @@ Game::~Game()
 	delete background;
 	delete spaceship;
 
-	for (int i = 0; i < m_small_asteroids_count; i++) {
+	for (Uint8 i = 0; i < m_big_asteroids_count * 2; i++) {
 
 		if (i < m_big_asteroids_count) {
 			delete big_asteroids[i];
@@ -58,8 +58,8 @@ void Game::SwapDirections(Sprite* first, Sprite* second)
 {
 	int temporary_direction_X = first->GetDirectionX();
 	int temporary_direction_Y = first->GetDirectionY();
-	first->SetDirection(second->GetDirectionX(), second->GetDirectionY());
-	second->SetDirection(temporary_direction_X, temporary_direction_Y);
+	first->SetDirectionXY(second->GetDirectionX(), second->GetDirectionY());
+	second->SetDirectionXY(temporary_direction_X, temporary_direction_Y);
 }
 
 void Game::Destruction(Sprite*& first, Sprite*& second)
@@ -163,7 +163,7 @@ void Game::StartGameLoop() {
 					if (e.button.button == SDL_BUTTON_LEFT) {
 						if (is_shot_allowed) {
 							SDL_GetMouseState(&mouse_x, &mouse_y);
-							bullet = new Sprite(m_screen.GetRenderer(), "../data/bullet.png", COORD{ static_cast<short>(spaceship->GetPositionX() + 10), static_cast<short>(spaceship->GetPositionY() + 10) }, COORD{ static_cast<short>(mouse_x), static_cast<short>(mouse_y) }, 20, 20);
+							bullet = new Sprite(m_screen.GetRenderer(), "../data/bullet.png", COORD{ static_cast<short>(spaceship->GetPositionX() + 10), static_cast<short>(spaceship->GetPositionY() + 10) }, directionStruct{ static_cast<short>(mouse_x), static_cast<short>(mouse_y) }, 20, 20);
 						}
 					}
 
@@ -204,7 +204,7 @@ void Game::StartGameLoop() {
 			}
 		}
 		else if (spaceship == nullptr) {
-			spaceship = new Sprite(m_screen.GetRenderer(), "../data/spaceship.png", COORD{ static_cast<short>(m_screen.GetScreenWidth() / 2), static_cast<short>(m_screen.GetScreenHeight() / 2) }, COORD{ 0, 0 }, 30, 30);
+			spaceship = new Sprite(m_screen.GetRenderer(), "../data/spaceship.png", COORD{ static_cast<short>(m_screen.GetScreenWidth() / 2), static_cast<short>(m_screen.GetScreenHeight() / 2) }, directionStruct{ 0, 0 }, 30, 30);
 			is_shot_allowed = true;
 		}
 
@@ -213,7 +213,7 @@ void Game::StartGameLoop() {
 
 		background->Draw(m_screen.GetRenderer());
 
-		for (int i = 0; i < m_small_asteroids_count; i++) {
+		for (Uint8 i = 0; i < m_big_asteroids_count * 2; i++) {
 			if (i < m_big_asteroids_count) {
 				if (big_asteroids[i] != nullptr) {
 					big_asteroids[i]->Move(m_screen);
@@ -226,7 +226,7 @@ void Game::StartGameLoop() {
 					}
 
 					//big vs big
-					for (int j = i + 1; j < m_big_asteroids_count - 1; j++) {
+					for (Uint8 j = i + 1; j < m_big_asteroids_count - 1; j++) {
 						if (big_asteroids[j] != nullptr) {
 							if (IsCollision(big_asteroids[i], big_asteroids[j])) {
 								SwapDirections(big_asteroids[i], big_asteroids[j]);
@@ -237,9 +237,9 @@ void Game::StartGameLoop() {
 					//bullet vs big
 					if (bullet != nullptr) {
 						if (IsCollision(bullet, big_asteroids[i])) {
-							small_asteroids[m_small_asteroids_count] = new Sprite(m_screen.GetRenderer(), "../data/small_asteroid.png", COORD{ static_cast<short>(big_asteroids[i]->GetPositionX() + 15), static_cast<short>(big_asteroids[i]->GetPositionY() + 50) }, COORD{ static_cast<short>(big_asteroids[i]->GetDirectionX() / 2), static_cast<short>(big_asteroids[i]->GetDirectionY() * 2) }, 30, 30);
+							small_asteroids[m_small_asteroids_count] = new Sprite(m_screen.GetRenderer(), "../data/small_asteroid.png", COORD{ static_cast<short>(big_asteroids[i]->GetPositionX() + 15), static_cast<short>(big_asteroids[i]->GetPositionY() + 50) }, directionStruct{ static_cast<short>(big_asteroids[i]->GetDirectionX() / 2), static_cast<short>(big_asteroids[i]->GetDirectionY() * 2) }, 30, 30);
 							m_small_asteroids_count++;
-							small_asteroids[m_small_asteroids_count] = new Sprite(m_screen.GetRenderer(), "../data/small_asteroid.png", COORD{ static_cast<short>(big_asteroids[i]->GetPositionX() + 50), static_cast<short>(big_asteroids[i]->GetPositionY() + 15) }, COORD{ static_cast<short>(big_asteroids[i]->GetDirectionX() * 2), static_cast<short>(big_asteroids[i]->GetDirectionY() / 2) }, 30, 30);
+							small_asteroids[m_small_asteroids_count] = new Sprite(m_screen.GetRenderer(), "../data/small_asteroid.png", COORD{ static_cast<short>(big_asteroids[i]->GetPositionX() + 50), static_cast<short>(big_asteroids[i]->GetPositionY() + 15) }, directionStruct{ static_cast<short>(big_asteroids[i]->GetDirectionX() * 2), static_cast<short>(big_asteroids[i]->GetDirectionY() / 2) }, 30, 30);
 							m_small_asteroids_count++;
 
 							Destruction(bullet, big_asteroids[i]);
@@ -262,7 +262,7 @@ void Game::StartGameLoop() {
 				}
 
 				//small vs big
-				for (int j = 0; j < m_big_asteroids_count; j++) {
+				for (Uint8 j = 0; j < m_big_asteroids_count; j++) {
 					if (big_asteroids[j] != nullptr) {
 						if (IsCollision(small_asteroids[i], big_asteroids[j])) {
 							SwapDirections(small_asteroids[i], big_asteroids[j]);
@@ -271,7 +271,7 @@ void Game::StartGameLoop() {
 				}
 
 				//small vs small
-				for (int j = 0; j < m_small_asteroids_count; j++) {
+				for (Uint8 j = 0; j < m_small_asteroids_count; j++) {
 					if (small_asteroids[j] != nullptr && i != j) {
 						if (IsCollision(small_asteroids[i], small_asteroids[j])) {
 							SwapDirections(small_asteroids[i], small_asteroids[j]);
