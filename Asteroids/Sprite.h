@@ -5,7 +5,7 @@
 #include "SDL_image.h"
 #include <windows.h>
 
-struct directionStruct {
+struct DirectionStruct {
 	short X;
 	short Y;
 };
@@ -13,7 +13,7 @@ struct directionStruct {
 class Sprite
 {
 public:
-	Sprite(SDL_Renderer* _renderer, const char* _path_to_image, COORD _start_point, directionStruct _direction, Uint16 _screen_width, Uint16 _screen_height);
+	Sprite(SDL_Renderer* _renderer, const char* _path_to_image, COORD _start_point, DirectionStruct _direction, uint16_t _screen_width, uint16_t _screen_height);
 	~Sprite();
 
 	void Draw(SDL_Renderer* m_renderer);
@@ -29,8 +29,8 @@ public:
 	void SetDirectionX(int _X);
 	void SetDirectionY(int _Y);
 
-	int GetDirectionX();
-	int GetDirectionY();
+	short GetDirectionX();
+	short GetDirectionY();
 
 	void Move(Screen& _scr);
 
@@ -46,5 +46,5 @@ private:
 		int Y;
 	} orgin;
 
-	directionStruct direction;
+	DirectionStruct direction;
 };

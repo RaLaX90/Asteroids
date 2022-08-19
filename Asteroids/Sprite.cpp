@@ -1,6 +1,6 @@
 #include "Sprite.h"
 
-Sprite::Sprite(SDL_Renderer* _renderer, const char* _path_to_image, COORD _position, directionStruct _direction, Uint16 _screen_width, Uint16 _screen_height)
+Sprite::Sprite(SDL_Renderer* _renderer, const char* _path_to_image, COORD _position, DirectionStruct _direction, uint16_t _screen_width, uint16_t _screen_height)
 {
 	this->position.x = _position.X;
 	this->position.y = _position.Y;
@@ -71,12 +71,12 @@ void Sprite::SetDirectionY(int _Y)
 	this->direction.Y = _Y;
 }
 
-int Sprite::GetDirectionX()
+short Sprite::GetDirectionX()
 {
 	return this->direction.X;
 }
 
-int Sprite::GetDirectionY()
+short Sprite::GetDirectionY()
 {
 	return this->direction.Y;
 }

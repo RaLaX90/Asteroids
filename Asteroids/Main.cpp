@@ -7,7 +7,7 @@ int main(int argc, char* argv[]) {
 	try
 	{
 		Screen m_screen{ 1920, 1080, 1920, 1080 };
-		Game game{ &m_screen, 5, 120 };
+		Game game{ &m_screen, -5, 120 };
 
 		//do {
 		game.StartGameLoop();

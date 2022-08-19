@@ -18,7 +18,7 @@ using namespace std;
 class Game
 {
 public:
-	Game(Screen* _scr, Uint8 _big_asteroids_count, Uint8 _latency = 100);
+	Game(const Screen* _scr, uint8_t _big_asteroids_count, uint8_t _latency = 100);
 	~Game();
 	void StartGameLoop();				// main game loop
 	void SwapDirections(Sprite* _first, Sprite* _second);
@@ -28,11 +28,11 @@ public:
 private:
 	enum State { STATE_OK = 0, STATE_EXIT, STATE_DIED };
 
-	//Uint8 m_latency;										// delay between position changes in milliseconds
+	//uint8_t m_latency;										// delay between position changes in milliseconds
 	Screen m_screen;										// m_screen object
 	clock_t m_duration;									// game m_duration
 
-	Uint8 m_big_asteroids_count = 0, m_small_asteroids_count = 0;
+	uint8_t m_big_asteroids_count = 0, m_small_asteroids_count = 0;
 	Sprite* spaceship = nullptr;
 	Sprite* background = nullptr;
 	Sprite* bullet = nullptr;
